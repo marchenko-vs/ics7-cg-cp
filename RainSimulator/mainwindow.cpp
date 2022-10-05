@@ -3,16 +3,12 @@
 
 #include "vertex.h"
 #include "face.h"
+#include "object.h"
 
 #include <iostream>
 #include <cstdlib>
 
-/* self-written functions to draw instead of any libs */
-void drawPoint(int x, int y, QGraphicsScene *scene, QColor color)
-{
-    scene->addLine(x, -y, x + 1, -y - 1, color);
-}
-
+/* self-written functions to draw instead of any libs
 void drawLine(int x_0, int y_0, int x_1, int y_1,
               QGraphicsScene *scene, QColor color)
 {
@@ -67,7 +63,7 @@ void drawLine(int x_0, int y_0, int x_1, int y_1,
             error_2 -= dx * 2;
         }
     }
-}
+} */
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

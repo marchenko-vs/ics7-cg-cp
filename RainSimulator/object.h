@@ -14,8 +14,11 @@ class Object
 public:
     Object();
 
+    void triangle(vertex_t t0, vertex_t t1, vertex_t t2,
+                  QGraphicsScene *scene, QColor color);
+
     void draw(const int width, const int height,
-              QGraphicsScene *scene, QColor color) const;
+              QGraphicsScene *scene, QColor color);
 
     void GetObject(const char *const filename);
 
