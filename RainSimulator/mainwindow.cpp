@@ -8,6 +8,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <QPushButton>
+
 /* self-written functions to draw instead of any libs
 void drawLine(int x_0, int y_0, int x_1, int y_1,
               QGraphicsScene *scene, QColor color)
@@ -69,8 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    const int width = 1000;
-    const int height = 700;
+    const int width = 660;
+    const int height = 540;
 
     const QColor white_color = QColor(255, 255, 255);
 
@@ -81,8 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setScene(scene);
     scene->setBackgroundBrush(Qt::black);
 
-    obj = new Object;
-    obj->GetObject("../RainSimulator/obj/african_head.obj");
+    obj = new Object("../RainSimulator/obj/droplet.obj");
     obj->draw(width, height, scene, white_color);
 }
 
@@ -90,3 +91,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    scene->clear();
+}
+

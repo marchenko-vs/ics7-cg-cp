@@ -11,7 +11,8 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    object.cpp
+    object.cpp \
+    vertex.cpp
 
 HEADERS += \
     face.h \

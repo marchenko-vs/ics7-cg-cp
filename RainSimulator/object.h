@@ -13,25 +13,24 @@ class Object
 {
 public:
     Object();
+    Object(const char *const filename);
 
-    void triangle(vertex_t t0, vertex_t t1, vertex_t t2,
+    void triangle(Vertex t0, Vertex t1, Vertex t2, const int width, int *z_buffer,
                   QGraphicsScene *scene, QColor color);
 
     void draw(const int width, const int height,
               QGraphicsScene *scene, QColor color);
 
-    void GetObject(const char *const filename);
-
     std::size_t getVerticesNumber() const;
     std::size_t getFacesNumber() const;
 
-    vertex_t getVertex(std::size_t number) const;
+    Vertex getVertex(std::size_t number) const;
     face_t getFace(std::size_t number) const;
 
     ~Object();
 
 private:
-    std::vector<vertex_t> vertices;
+    std::vector<Vertex> vertices;
     std::vector<face_t> faces;
 };
 
