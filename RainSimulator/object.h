@@ -21,6 +21,12 @@ public:
     void draw(const int width, const int height,
               QGraphicsScene *scene, QColor color);
 
+    void transfer(double dx, double dy, double dz);
+
+    void rotate_x(double degrees);
+    void rotate_y(double degrees);
+    void rotate_z(double degrees);
+
     std::size_t getVerticesNumber() const;
     std::size_t getFacesNumber() const;
 
@@ -29,7 +35,7 @@ public:
 
     ~Object();
 
-private:
+public:
     std::vector<Vertex> vertices;
     std::vector<face_t> faces;
 };

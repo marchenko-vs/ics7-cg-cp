@@ -81,10 +81,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
-    scene->setBackgroundBrush(Qt::black);
+    scene->setBackgroundBrush(QColor(0, 0, 110));
 
-    obj = new Object("../RainSimulator/obj/droplet.obj");
-    obj->draw(width, height, scene, white_color);
+    obj = new Object("../RainSimulator/obj/cube.obj");
+    obj->draw(650, 540, scene, QColor(255, 255, 255));
 }
 
 MainWindow::~MainWindow()
@@ -95,5 +95,19 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     scene->clear();
+    obj->rotate_z(30);
+    obj->draw(650, 540, scene, QColor(255, 255, 255));
+}
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    scene->setBackgroundBrush(QColor(102, 178, 255));
+}
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    scene->setBackgroundBrush(QColor(0, 0, 110));
 }
 

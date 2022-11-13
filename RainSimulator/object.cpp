@@ -15,6 +15,11 @@ Object::Object()
 
 }
 
+Object::~Object()
+{
+
+}
+
 static void drawLine(int x, int y, QGraphicsScene *scene, QColor color)
 {
     scene->addLine(x, -y, x + 1, -y + 1, color);
@@ -99,7 +104,7 @@ void Object::draw(const int width, const int height,
         Vertex t_2 = { x_2, y_2, z_2 };
 
         Vertex normal = (v_2 - v_0) ^ (v_1 - v_0);
-        Vertex light_dir = { 0, 0, 1 };
+        Vertex light_dir = { 0, 0, -1 };
 
         normal.normalize();
 
@@ -188,4 +193,61 @@ Object::Object(const char *const filename)
     }
 
     input_file.close();
+}
+
+void Object::transfer(double dx, double dy, double dz)
+{
+    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
+    {
+        this->vertices[i].x += dx;
+        this->vertices[i].y += dy;
+        this->vertices[i].z += dz;
+    }
+}
+
+void Object::rotate_x(double degrees)
+{
+    double radians = degrees * 3.14 / 180;
+    double x_old, y_old, z_old;
+
+    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
+    {
+        x_old = this->vertices[i].x;
+        y_old = this->vertices[i].y;
+        z_old = this->vertices[i].z;
+
+        this->vertices[i].y = y_old * cos(radians) - z_old * sin(radians);
+        this->vertices[i].z = y_old * sin(radians) + z_old * cos(radians);
+    }
+}
+
+void Object::rotate_y(double degrees)
+{
+    double radians = degrees * 3.14 / 180;
+    double x_old, y_old, z_old;
+
+    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
+    {
+        x_old = this->vertices[i].x;
+        y_old = this->vertices[i].y;
+        z_old = this->vertices[i].z;
+
+        this->vertices[i].x = z_old * sin(radians) + x_old * cos(radians);
+        this->vertices[i].z = y_old * cos(radians) - x_old * sin(radians);
+    }
+}
+
+void Object::rotate_z(double degrees)
+{
+    double radians = degrees * 3.14 / 180;
+    double x_old, y_old;
+
+    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
+    {
+        x_old = this->vertices[i].x;
+        y_old = this->vertices[i].y;
+
+        this->vertices[i].x = x_old * cos(radians) - y_old * sin(radians);
+        this->vertices[i].y = x_old * sin(radians) + y_old * cos(radians);
+    }
 }
