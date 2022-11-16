@@ -1,20 +1,60 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <cstdlib>
+#define SIZE 4
 
 #include "vertex.h"
 
-class Matrix
+class Vector4d
 {
 public:
-    Matrix(const Vertex &vertex);
+    double x, y, z, w;
+public:
+    Vector4d();
+    Vector4d(const Vertex &vertex);
+};
 
-    ~Matrix();
-private:
-    double **elements;
-    size_t rows;
-    size_t columns;
+class BaseMatrix
+{
+public:
+    double elements[SIZE][SIZE];
+
+public:
+    BaseMatrix();
+
+    BaseMatrix operator * (const BaseMatrix &matrix);
+    Vector4d operator * (const Vector4d &vector);
+
+    ~BaseMatrix()
+    {
+
+    }
+};
+
+class TranslationMatrix : public BaseMatrix
+{
+public:
+    TranslationMatrix();
+    TranslationMatrix(const Vertex &vertex);
+};
+
+class ScaleMatrix : public BaseMatrix
+{
+public:
+    ScaleMatrix();
+    ScaleMatrix(const Vertex &vertex);
+};
+
+class ViewMatrix : public BaseMatrix
+{
+public:
+    ViewMatrix();
+};
+
+class ProjectionMatrix : public BaseMatrix
+{
+public:
+    ProjectionMatrix();
 };
 
 #endif // MATRIX_H

@@ -7,6 +7,18 @@ Vertex::Vertex()
     this->x = 0.0;
     this->y = 0.0;
     this->z = 0.0;
+
+    this->dx = 0.0;
+    this->dy = 0.0;
+    this->dz = 0.0;
+
+    this->kx = 1.0;
+    this->ky = 1.0;
+    this->kz = 1.0;
+
+    this->phi_x = 0.0;
+    this->phi_y = 0.0;
+    this->phi_z = 0.0;
 }
 
 Vertex::Vertex(double x, double y, double z)
@@ -14,6 +26,18 @@ Vertex::Vertex(double x, double y, double z)
     this->x = x;
     this->y = y;
     this->z = z;
+
+    this->dx = 0.0;
+    this->dy = 0.0;
+    this->dz = 0.0;
+
+    this->kx = 1.0;
+    this->ky = 1.0;
+    this->kz = 1.0;
+
+    this->phi_x = 0.0;
+    this->phi_y = 0.0;
+    this->phi_z = 0.0;
 }
 
 Vertex Vertex::operator + (const Vertex &vertex)

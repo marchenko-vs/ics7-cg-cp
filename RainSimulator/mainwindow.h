@@ -4,7 +4,12 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 
+#include <cstdlib>
+
 #include "object.h"
+
+#define WIDTH 600
+#define HEIGHT 600
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

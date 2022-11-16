@@ -1,5 +1,6 @@
 #include "object.h"
 #include "vertex.h"
+#include "matrix.h"
 
 #include <iostream>
 #include <fstream>
@@ -71,7 +72,7 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
     }
 }
 
-void Object::draw(const int width, const int height,
+void Object::draw(const std::size_t width, const std::size_t height,
                   QGraphicsScene *scene, QColor color)
 {
     int *z_buffer = new int[width * height];
@@ -87,17 +88,36 @@ void Object::draw(const int width, const int height,
         Vertex v_1 = this->getVertex(current_face.vertices[1]);
         Vertex v_2 = this->getVertex(current_face.vertices[2]);
 
-        int x_0 = (v_0.x + 1.0) * width / 2.0;
-        int y_0 = (v_0.y + 1.0) * height / 2.0;
-        int z_0 = (v_0.z + 1.0) * 255 / 2.0;
+        Vector4d vec4d_0 = Vector4d(v_0);
+        Vector4d vec4d_1 = Vector4d(v_1);
+        Vector4d vec4d_2 = Vector4d(v_2);
 
-        int x_1 = (v_1.x + 1.0) * width / 2.0;
-        int y_1 = (v_1.y + 1.0) * height / 2.0;
-        int z_1 = (v_1.z + 1.0) * 255 / 2.0;
+        TranslationMatrix matrix_0 = TranslationMatrix(v_0);
+        TranslationMatrix matrix_1 = TranslationMatrix(v_1);
+        TranslationMatrix matrix_2 = TranslationMatrix(v_2);
 
-        int x_2 = (v_2.x + 1.0) * width / 2.0;
-        int y_2 = (v_2.y + 1.0) * height / 2.0;
-        int z_2 = (v_2.z + 1.0) * 255 / 2.0;
+        ScaleMatrix sc_matrix_0 = ScaleMatrix(v_0);
+        ScaleMatrix sc_matrix_1 = ScaleMatrix(v_1);
+        ScaleMatrix sc_matrix_2 = ScaleMatrix(v_2);
+
+        //ViewMatrix view_matrix = ViewMatrix();
+        ProjectionMatrix projection_matrix = ProjectionMatrix();
+
+        vec4d_0 = projection_matrix * matrix_0 * sc_matrix_0 * vec4d_0;
+        vec4d_1 = projection_matrix * matrix_1 * sc_matrix_1 * vec4d_1;
+        vec4d_2 = projection_matrix * matrix_2 * sc_matrix_2 * vec4d_2;
+
+        int x_0 = (vec4d_0.x + 1.0) * width / 2.0;
+        int y_0 = (vec4d_0.y + 1.0) * height / 2.0;
+        int z_0 = (vec4d_0.z + 1.0) * 255 / 2.0;
+
+        int x_1 = (vec4d_1.x + 1.0) * width / 2.0;
+        int y_1 = (vec4d_1.y + 1.0) * height / 2.0;
+        int z_1 = (vec4d_1.z + 1.0) * 255 / 2.0;
+
+        int x_2 = (vec4d_2.x + 1.0) * width / 2.0;
+        int y_2 = (vec4d_2.y + 1.0) * height / 2.0;
+        int z_2 = (vec4d_2.z + 1.0) * 255 / 2.0;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };

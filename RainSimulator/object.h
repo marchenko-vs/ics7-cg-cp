@@ -18,7 +18,7 @@ public:
     void triangle(Vertex t0, Vertex t1, Vertex t2, const int width, int *z_buffer,
                   QGraphicsScene *scene, QColor color);
 
-    void draw(const int width, const int height,
+    void draw(const std::size_t width, const std::size_t height,
               QGraphicsScene *scene, QColor color);
 
     void transfer(double dx, double dy, double dz);

@@ -11,12 +11,14 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    matrix.cpp \
     object.cpp \
     vertex.cpp
 
 HEADERS += \
     face.h \
     mainwindow.h \
+    matrix.h \
     object.h \
     vertex.h
 
