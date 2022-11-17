@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setScene(scene);
     scene->setBackgroundBrush(QColor(0, 0, 110));
 
-    obj = new Object("../RainSimulator/obj/cube.obj");
+    obj = new Object("../RainSimulator/obj/african_head.obj");
     obj->draw(WIDTH, HEIGHT, scene, QColor(255, 255, 255));
 }
 

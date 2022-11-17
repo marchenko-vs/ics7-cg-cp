@@ -1,6 +1,7 @@
 #include "object.h"
 #include "vertex.h"
 #include "matrix.h"
+#include "mainwindow.h"
 
 #include <iostream>
 #include <fstream>
@@ -100,33 +101,34 @@ void Object::draw(const std::size_t width, const std::size_t height,
         ScaleMatrix sc_matrix_1 = ScaleMatrix(v_1);
         ScaleMatrix sc_matrix_2 = ScaleMatrix(v_2);
 
-        //ViewMatrix view_matrix = ViewMatrix();
+        ViewMatrix view_matrix = ViewMatrix();
         ProjectionMatrix projection_matrix = ProjectionMatrix();
 
-        vec4d_0 = projection_matrix * matrix_0 * sc_matrix_0 * vec4d_0;
-        vec4d_1 = projection_matrix * matrix_1 * sc_matrix_1 * vec4d_1;
-        vec4d_2 = projection_matrix * matrix_2 * sc_matrix_2 * vec4d_2;
+        vec4d_0 = projection_matrix * (view_matrix * ((matrix_0 * sc_matrix_0) * vec4d_0));
+        vec4d_1 = projection_matrix * view_matrix * matrix_1 * sc_matrix_1 * vec4d_1;
+        vec4d_2 = projection_matrix * view_matrix * matrix_2 * sc_matrix_2 * vec4d_2;
 
-        int x_0 = (vec4d_0.x + 1.0) * width / 2.0;
-        int y_0 = (vec4d_0.y + 1.0) * height / 2.0;
+        int x_0 = (vec4d_0.x + 1.0) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.y + 1.0) * HEIGHT / 2.0;
         int z_0 = (vec4d_0.z + 1.0) * 255 / 2.0;
 
-        int x_1 = (vec4d_1.x + 1.0) * width / 2.0;
-        int y_1 = (vec4d_1.y + 1.0) * height / 2.0;
+        int x_1 = (vec4d_1.x + 1.0) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.y + 1.0) * HEIGHT / 2.0;
         int z_1 = (vec4d_1.z + 1.0) * 255 / 2.0;
 
-        int x_2 = (vec4d_2.x + 1.0) * width / 2.0;
-        int y_2 = (vec4d_2.y + 1.0) * height / 2.0;
+        int x_2 = (vec4d_2.x + 1.0) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.y + 1.0) * HEIGHT / 2.0;
         int z_2 = (vec4d_2.z + 1.0) * 255 / 2.0;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
         Vertex t_2 = { x_2, y_2, z_2 };
 
-        Vertex normal = (v_2 - v_0) ^ (v_1 - v_0);
+        Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
         Vertex light_dir = { 0, 0, -1 };
 
         normal.normalize();
+        light_dir.normalize();
 
         double intensity = normal * light_dir;
 
