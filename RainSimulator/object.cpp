@@ -11,10 +11,24 @@
 #include <cstdlib>
 
 #include <QDebug>
+#include <QImage>
 
 Object::Object()
 {
 
+}
+
+RainDroplet::RainDroplet()
+{
+
+}
+
+RainDroplet::RainDroplet(const RainDroplet &object)
+{
+    for (std::size_t i = 0; i < object.getVerticesNumber(); i++)
+        this->vertices.push_back(object.vertices[i]);
+    for (std::size_t i = 0; i < object.getFacesNumber(); i++)
+        this->faces.push_back(object.faces[i]);
 }
 
 Object::~Object()
@@ -22,13 +36,8 @@ Object::~Object()
 
 }
 
-static void drawLine(int x, int y, QGraphicsScene *scene, QColor color)
-{
-    scene->addLine(x, -y, x + 1, -y + 1, color);
-}
-
 void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
-                      int *z_buffer, QGraphicsScene *scene, QColor color)
+                      int *z_buffer, QImage *scene, QColor color)
 {
     if (t0.y == t1.y && t0.y == t2.y) // вырожденный полигон
         return;
@@ -67,14 +76,14 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
             if (z_buffer[k] < P.z)
             {
                 z_buffer[k] = P.z;
-                drawLine(P.x, P.y, scene, color);
+                scene->setPixel(P.x, P.y, color.rgb());
             }
         }
     }
 }
 
 void Object::draw(const std::size_t width, const std::size_t height,
-                  QGraphicsScene *scene, QColor color)
+                  uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
 {
     int *z_buffer = new int[width * height];
 
@@ -93,20 +102,27 @@ void Object::draw(const std::size_t width, const std::size_t height,
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
 
-        TranslationMatrix matrix_0 = TranslationMatrix(v_0);
-        TranslationMatrix matrix_1 = TranslationMatrix(v_1);
-        TranslationMatrix matrix_2 = TranslationMatrix(v_2);
+        TranslationMatrix translation_matrix_0 = TranslationMatrix(v_0);
+        TranslationMatrix translation_matrix_1 = TranslationMatrix(v_1);
+        TranslationMatrix translation_matrix_2 = TranslationMatrix(v_2);
 
-        ScaleMatrix sc_matrix_0 = ScaleMatrix(v_0);
-        ScaleMatrix sc_matrix_1 = ScaleMatrix(v_1);
-        ScaleMatrix sc_matrix_2 = ScaleMatrix(v_2);
+        ScaleMatrix scale_matrix_0 = ScaleMatrix(v_0);
+        ScaleMatrix scale_matrix_1 = ScaleMatrix(v_1);
+        ScaleMatrix scale_matrix_2 = ScaleMatrix(v_2);
+
+        RotateMatrix rotate_matrix_0 = RotateMatrix(v_0);
+        RotateMatrix rotate_matrix_1 = RotateMatrix(v_1);
+        RotateMatrix rotate_matrix_2 = RotateMatrix(v_2);
 
         ViewMatrix view_matrix = ViewMatrix();
         ProjectionMatrix projection_matrix = ProjectionMatrix();
 
-        vec4d_0 = projection_matrix * (view_matrix * ((matrix_0 * sc_matrix_0) * vec4d_0));
-        vec4d_1 = projection_matrix * view_matrix * matrix_1 * sc_matrix_1 * vec4d_1;
-        vec4d_2 = projection_matrix * view_matrix * matrix_2 * sc_matrix_2 * vec4d_2;
+        vec4d_0 = projection_matrix * view_matrix * translation_matrix_0 *
+                rotate_matrix_0 * scale_matrix_0 * vec4d_0;
+        vec4d_1 = projection_matrix * view_matrix * translation_matrix_1 *
+                rotate_matrix_1 * scale_matrix_1 * vec4d_1;
+        vec4d_2 = projection_matrix * view_matrix * translation_matrix_2 *
+                rotate_matrix_2 * scale_matrix_2 * vec4d_2;
 
         int x_0 = (vec4d_0.x + 1.0) * WIDTH / 2.0;
         int y_0 = (vec4d_0.y + 1.0) * HEIGHT / 2.0;
@@ -119,6 +135,14 @@ void Object::draw(const std::size_t width, const std::size_t height,
         int x_2 = (vec4d_2.x + 1.0) * WIDTH / 2.0;
         int y_2 = (vec4d_2.y + 1.0) * HEIGHT / 2.0;
         int z_2 = (vec4d_2.z + 1.0) * 255 / 2.0;
+
+        if (x_0 > WIDTH || y_0 > HEIGHT ||
+                x_1 > WIDTH || y_1 > HEIGHT ||
+                x_2 > WIDTH || y_2 > HEIGHT ||
+                x_0 < 0 || y_0 < 0 ||
+                                x_1 < 0 || y_1 < 0 ||
+                                x_2 < 0 || y_2 < 0)
+            continue;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
@@ -134,7 +158,10 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
         if (intensity > 0)
             triangle(t_0, t_1, t_2, width, z_buffer, scene,
-                     QColor(0, intensity * 191, intensity * 255));
+                     QColor(intensity * red, intensity * green, intensity * blue));
+        else
+            triangle(t_0, t_1, t_2, width, z_buffer, scene,
+                     QColor(intensity * red, intensity * green, intensity * blue));
     }
 
     delete[] z_buffer;
@@ -217,7 +244,118 @@ Object::Object(const char *const filename)
     input_file.close();
 }
 
-void Object::transfer(double dx, double dy, double dz)
+RainDroplet::RainDroplet(const char *const filename)
+{
+    std::ifstream input_file;
+    input_file.open(filename, std::ifstream::in);
+
+    if (input_file.fail())
+        return;
+
+    std::string line;
+
+    while (!input_file.eof())
+    {
+        std::getline(input_file, line);
+        std::istringstream iss(line.c_str());
+        char trash;
+
+        if (!line.compare(0, 2, "v "))
+        {
+            iss >> trash;
+            Vertex v;
+
+            iss >> v.x;
+            iss >> v.y;
+            iss >> v.z;
+
+            this->vertices.push_back(v);
+        }
+        else if (!line.compare(0, 2, "f "))
+        {
+            std::vector<int> f;
+            int itrash, idx;
+
+            iss >> trash;
+
+            while (iss >> idx >> trash >> itrash >> trash >> itrash)
+            {
+                idx--;
+                f.push_back(idx);
+            }
+
+            face_t face;
+
+            face.vertices[0] = f[0];
+            face.vertices[1] = f[1];
+            face.vertices[2] = f[2];
+
+            this->faces.push_back(face);
+        }
+    }
+
+    input_file.close();
+
+    this->scale(-0.9, -0.9, -0.9);
+}
+
+Ground::Ground(const char *const filename)
+{
+    std::ifstream input_file;
+    input_file.open(filename, std::ifstream::in);
+
+    if (input_file.fail())
+        return;
+
+    std::string line;
+
+    while (!input_file.eof())
+    {
+        std::getline(input_file, line);
+        std::istringstream iss(line.c_str());
+        char trash;
+
+        if (!line.compare(0, 2, "v "))
+        {
+            iss >> trash;
+            Vertex v;
+
+            iss >> v.x;
+            iss >> v.y;
+            iss >> v.z;
+
+            this->vertices.push_back(v);
+        }
+        else if (!line.compare(0, 2, "f "))
+        {
+            std::vector<int> f;
+            int itrash, idx;
+
+            iss >> trash;
+
+            while (iss >> idx >> trash >> itrash >> trash >> itrash)
+            {
+                idx--;
+                f.push_back(idx);
+            }
+
+            face_t face;
+
+            face.vertices[0] = f[0];
+            face.vertices[1] = f[1];
+            face.vertices[2] = f[2];
+
+            this->faces.push_back(face);
+        }
+    }
+
+    input_file.close();
+
+    this->rotate(-10, 0, 0);
+    this->translate(0, -1, 0);
+}
+
+void Object::translate(double dx, double dy, double dz)
 {
     for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
     {
@@ -227,49 +365,22 @@ void Object::transfer(double dx, double dy, double dz)
     }
 }
 
-void Object::rotate_x(double degrees)
+void Object::scale(double kx, double ky, double kz)
 {
-    double radians = degrees * 3.14 / 180;
-    double x_old, y_old, z_old;
-
     for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
     {
-        x_old = this->vertices[i].x;
-        y_old = this->vertices[i].y;
-        z_old = this->vertices[i].z;
-
-        this->vertices[i].y = y_old * cos(radians) - z_old * sin(radians);
-        this->vertices[i].z = y_old * sin(radians) + z_old * cos(radians);
+        this->vertices[i].kx += kx;
+        this->vertices[i].ky += ky;
+        this->vertices[i].kz += kz;
     }
 }
 
-void Object::rotate_y(double degrees)
+void Object::rotate(double phi_x, double phi_y, double phi_z)
 {
-    double radians = degrees * 3.14 / 180;
-    double x_old, y_old, z_old;
-
     for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
     {
-        x_old = this->vertices[i].x;
-        y_old = this->vertices[i].y;
-        z_old = this->vertices[i].z;
-
-        this->vertices[i].x = z_old * sin(radians) + x_old * cos(radians);
-        this->vertices[i].z = y_old * cos(radians) - x_old * sin(radians);
-    }
-}
-
-void Object::rotate_z(double degrees)
-{
-    double radians = degrees * 3.14 / 180;
-    double x_old, y_old;
-
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        x_old = this->vertices[i].x;
-        y_old = this->vertices[i].y;
-
-        this->vertices[i].x = x_old * cos(radians) - y_old * sin(radians);
-        this->vertices[i].y = x_old * sin(radians) + y_old * cos(radians);
+        this->vertices[i].phi_x += phi_x * 3.14 / 180;
+        this->vertices[i].phi_y += phi_y * 3.14 / 180;
+        this->vertices[i].phi_z += phi_z * 3.14 / 180;
     }
 }

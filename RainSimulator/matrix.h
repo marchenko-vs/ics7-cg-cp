@@ -55,6 +55,13 @@ public:
     ScaleMatrix(const Vertex &vertex);
 };
 
+class RotateMatrix : public BaseMatrix
+{
+public:
+    RotateMatrix();
+    RotateMatrix(const Vertex &vertex);
+};
+
 class ViewMatrix : public BaseMatrix
 {
 public:

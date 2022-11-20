@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "matrix.h"
+#include "mainwindow.h"
 
 Vector4d::Vector4d()
 {
@@ -170,6 +171,56 @@ TranslationMatrix::TranslationMatrix(const Vertex &vertex)
     this->elements[2][3] = vertex.dz;
 }
 
+RotateMatrix::RotateMatrix(const Vertex &vertex)
+{
+    BaseMatrix rotate_x, rotate_y, rotate_z;
+    BaseMatrix result;
+
+    for (std::size_t i = 0; i < SIZE; i++)
+    {
+        for (std::size_t j = 0; j < SIZE; j++)
+        {
+            if (i == j)
+            {
+                rotate_x.elements[i][j] = 1.0;
+                rotate_y.elements[i][j] = 1.0;
+                rotate_z.elements[i][j] = 1.0;
+
+                this->elements[i][j] = 1.0;
+            }
+            else
+            {
+                rotate_x.elements[i][j] = 0.0;
+                rotate_y.elements[i][j] = 0.0;
+                rotate_z.elements[i][j] = 0.0;
+
+                this->elements[i][j] = 0.0;
+            }
+        }
+    }
+
+    rotate_x.elements[1][1] = cos(vertex.phi_x);
+    rotate_x.elements[1][2] = -sin(vertex.phi_x);
+    rotate_x.elements[2][2] = cos(vertex.phi_x);
+    rotate_x.elements[2][1] = sin(vertex.phi_x);
+
+    rotate_y.elements[0][0] = cos(vertex.phi_y);
+    rotate_y.elements[0][2] = sin(vertex.phi_y);
+    rotate_y.elements[2][2] = cos(vertex.phi_y);
+    rotate_y.elements[2][0] = -sin(vertex.phi_y);
+
+    rotate_z.elements[0][0] = cos(vertex.phi_z);
+    rotate_z.elements[0][1] = -sin(vertex.phi_z);
+    rotate_z.elements[1][1] = cos(vertex.phi_z);
+    rotate_z.elements[1][0] = sin(vertex.phi_z);
+
+    result = rotate_x * rotate_y * rotate_z;
+
+    for (std::size_t i = 0; i < SIZE; i++)
+        for (std::size_t j = 0; j < SIZE; j++)
+            this->elements[i][j] = result.elements[i][j];
+}
+
 ScaleMatrix::ScaleMatrix(const Vertex &vertex)
 {
     for (std::size_t i = 0; i < SIZE; i++)
@@ -223,17 +274,18 @@ ViewMatrix::ViewMatrix()
 
 ProjectionMatrix::ProjectionMatrix()
 {
-    double phi = 90.0 / 2;
+    double phi = 130.0 * 3.14 / 180 / 2;
     int n = 1, f = 2;
+    double ratio = 1.0;
 
     for (std::size_t i = 0; i < SIZE; i++)
         for (std::size_t j = 0; j < SIZE; j++)
             this->elements[i][j] = 0.0;
 
-    this->elements[0][0] = 1 / tan(phi);
-    this->elements[1][1] = 1.0 / tan(phi);
+    this->elements[0][0] = ratio / tan(phi);
+    this->elements[1][1] = ratio / tan(phi);
     this->elements[2][2] = f / (f - n);
 
     this->elements[2][3] = -n * (f - n);
-    this->elements[3][2] = 1.0;
+    this->elements[3][2] = ratio;
 }

@@ -37,8 +37,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>1031</width>
-      <height>641</height>
+      <width>710</width>
+      <height>710</height>
      </rect>
     </property>
    </widget>
@@ -52,14 +52,14 @@
      </rect>
     </property>
     <property name="text">
-     <string>Переместить</string>
+     <string>Начать анимацию</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
       <x>1050</x>
-      <y>330</y>
+      <y>600</y>
       <width>221</width>
       <height>51</height>
      </rect>
@@ -72,7 +72,7 @@
     <property name="geometry">
      <rect>
       <x>1050</x>
-      <y>270</y>
+      <y>540</y>
       <width>221</width>
       <height>51</height>
      </rect>

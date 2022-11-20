@@ -3,13 +3,17 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QTimer>
 
 #include <cstdlib>
+#include <vector>
 
 #include "object.h"
 
-#define WIDTH 600
-#define HEIGHT 600
+#define WIDTH 700
+#define HEIGHT 700
+
+#define NUM_OF_DROPLETS 20
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,6 +37,13 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
-    Object *obj;
+    QImage *image;
+
+    RainDroplet **droplets;
+    Ground *ground;
+
+    QTimer *timer;
+
+    QColor mode = QColor(102, 178, 255);
 };
 #endif // MAINWINDOW_H
