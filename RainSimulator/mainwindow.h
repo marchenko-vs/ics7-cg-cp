@@ -11,7 +11,7 @@
 #include "object.h"
 
 #define WIDTH 700
-#define HEIGHT 700
+#define HEIGHT 630
 
 #define NUM_OF_DROPLETS 20
 
@@ -29,10 +29,10 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
-
     void on_pushButton_3_clicked();
+    void rotate_left();
+    void rotate_right();
 
 private:
     Ui::MainWindow *ui;

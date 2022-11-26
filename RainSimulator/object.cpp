@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <QImage>
 
+Vertex eye = Vertex(0, 0, -15);
+
 Object::Object()
 {
 
@@ -73,6 +75,10 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
             Vertex P = A + (B - A) * phi;
             int k = P.x + P.y * width;
 
+            if (P.x < 0 || P.x >= WIDTH ||
+                    P.y < 0 || P.y >= HEIGHT)
+                continue;
+
             if (z_buffer[k] < P.z)
             {
                 z_buffer[k] = P.z;
@@ -87,8 +93,19 @@ void Object::draw(const std::size_t width, const std::size_t height,
 {
     int *z_buffer = new int[width * height];
 
-    for (int i = 0; i < width * height; i++)
+    for (std::size_t i = 0; i < width * height; i++)
         z_buffer[i] = 0;
+
+    Vertex target = Vertex(0, 0, 0);
+    Vertex up = Vertex(0, 1, 0);
+
+    TranslationMatrix translation_matrix = TranslationMatrix(*this);
+    ScaleMatrix scale_matrix = ScaleMatrix(*this);
+    RotateMatrix rotation_matrix = RotateMatrix(*this);
+
+    ViewMatrix view_matrix = ViewMatrix(eye, target, up);
+    ProjectionMatrix projection_matrix = ProjectionMatrix(0.8, (double)WIDTH / (double)HEIGHT,
+                                                          0.1, 1.0);
 
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
@@ -102,54 +119,31 @@ void Object::draw(const std::size_t width, const std::size_t height,
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
 
-        TranslationMatrix translation_matrix_0 = TranslationMatrix(v_0);
-        TranslationMatrix translation_matrix_1 = TranslationMatrix(v_1);
-        TranslationMatrix translation_matrix_2 = TranslationMatrix(v_2);
+        vec4d_0 = projection_matrix * view_matrix * translation_matrix *
+                rotation_matrix * scale_matrix * vec4d_0;
+        vec4d_1 = projection_matrix * view_matrix * translation_matrix *
+                rotation_matrix * scale_matrix * vec4d_1;
+        vec4d_2 = projection_matrix * view_matrix * translation_matrix *
+                rotation_matrix * scale_matrix * vec4d_2;
 
-        ScaleMatrix scale_matrix_0 = ScaleMatrix(v_0);
-        ScaleMatrix scale_matrix_1 = ScaleMatrix(v_1);
-        ScaleMatrix scale_matrix_2 = ScaleMatrix(v_2);
+        int x_0 = (vec4d_0.x + 0.0) * WIDTH + WIDTH / 2.0;
+        int y_0 = (vec4d_0.y + 0.0) * HEIGHT + HEIGHT / 2.0;
+        int z_0 = vec4d_0.z;
 
-        RotateMatrix rotate_matrix_0 = RotateMatrix(v_0);
-        RotateMatrix rotate_matrix_1 = RotateMatrix(v_1);
-        RotateMatrix rotate_matrix_2 = RotateMatrix(v_2);
+        int x_1 = (vec4d_1.x + 0.0) * WIDTH + WIDTH / 2.0;
+        int y_1 = (vec4d_1.y + 0.0) * HEIGHT + HEIGHT / 2.0;
+        int z_1 = vec4d_1.z;
 
-        ViewMatrix view_matrix = ViewMatrix();
-        ProjectionMatrix projection_matrix = ProjectionMatrix();
-
-        vec4d_0 = projection_matrix * view_matrix * translation_matrix_0 *
-                rotate_matrix_0 * scale_matrix_0 * vec4d_0;
-        vec4d_1 = projection_matrix * view_matrix * translation_matrix_1 *
-                rotate_matrix_1 * scale_matrix_1 * vec4d_1;
-        vec4d_2 = projection_matrix * view_matrix * translation_matrix_2 *
-                rotate_matrix_2 * scale_matrix_2 * vec4d_2;
-
-        int x_0 = (vec4d_0.x + 1.0) * WIDTH / 2.0;
-        int y_0 = (vec4d_0.y + 1.0) * HEIGHT / 2.0;
-        int z_0 = (vec4d_0.z + 1.0) * 255 / 2.0;
-
-        int x_1 = (vec4d_1.x + 1.0) * WIDTH / 2.0;
-        int y_1 = (vec4d_1.y + 1.0) * HEIGHT / 2.0;
-        int z_1 = (vec4d_1.z + 1.0) * 255 / 2.0;
-
-        int x_2 = (vec4d_2.x + 1.0) * WIDTH / 2.0;
-        int y_2 = (vec4d_2.y + 1.0) * HEIGHT / 2.0;
-        int z_2 = (vec4d_2.z + 1.0) * 255 / 2.0;
-
-        if (x_0 > WIDTH || y_0 > HEIGHT ||
-                x_1 > WIDTH || y_1 > HEIGHT ||
-                x_2 > WIDTH || y_2 > HEIGHT ||
-                x_0 < 0 || y_0 < 0 ||
-                                x_1 < 0 || y_1 < 0 ||
-                                x_2 < 0 || y_2 < 0)
-            continue;
+        int x_2 = (vec4d_2.x + 0.0) * WIDTH + WIDTH / 2.0;
+        int y_2 = (vec4d_2.y + 0.0) * HEIGHT + HEIGHT / 2.0;
+        int z_2 = vec4d_2.z + 0.0;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
         Vertex t_2 = { x_2, y_2, z_2 };
 
         Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
-        Vertex light_dir = { 0, 0, -1 };
+        Vertex light_dir = { 1, 1, -1 };
 
         normal.normalize();
         light_dir.normalize();
@@ -242,6 +236,18 @@ Object::Object(const char *const filename)
     }
 
     input_file.close();
+
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(1.0);
+    this->set_ky(1.0);
+    this->set_kz(1.0);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
 }
 
 RainDroplet::RainDroplet(const char *const filename)
@@ -296,7 +302,19 @@ RainDroplet::RainDroplet(const char *const filename)
 
     input_file.close();
 
-    this->scale(-0.9, -0.9, -0.9);
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(1.0);
+    this->set_ky(1.0);
+    this->set_kz(1.0);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
+
+    //this->scale(-0.9, -0.9, -0.9);
 }
 
 Ground::Ground(const char *const filename)
@@ -351,36 +369,129 @@ Ground::Ground(const char *const filename)
 
     input_file.close();
 
-    this->rotate(-10, 0, 0);
-    this->translate(0, -1, 0);
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(1.0);
+    this->set_ky(1.0);
+    this->set_kz(1.0);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
+
+//    this->rotate(-10, 0, 0);
+//    this->translate(0, -1, 0);
 }
 
 void Object::translate(double dx, double dy, double dz)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].x += dx;
-        this->vertices[i].y += dy;
-        this->vertices[i].z += dz;
-    }
+    this->dx += dx;
+    this->dy += dy;
+    this->dz += dz;
 }
 
 void Object::scale(double kx, double ky, double kz)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].kx += kx;
-        this->vertices[i].ky += ky;
-        this->vertices[i].kz += kz;
-    }
+    this->kx += kx;
+    this->ky += ky;
+    this->kz += kz;
 }
 
 void Object::rotate(double phi_x, double phi_y, double phi_z)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].phi_x += phi_x * 3.14 / 180;
-        this->vertices[i].phi_y += phi_y * 3.14 / 180;
-        this->vertices[i].phi_z += phi_z * 3.14 / 180;
-    }
+    this->phi_x += phi_x * 3.14 / 180;
+    this->phi_y += phi_y * 3.14 / 180;
+    this->phi_z += phi_z * 3.14 / 180;
+}
+
+double Object::get_dx() const
+{
+    return this->dx;
+}
+
+double Object::get_dy() const
+{
+    return this->dy;
+}
+
+double Object::get_dz() const
+{
+    return this->dz;
+}
+
+double Object::get_kx() const
+{
+    return this->kx;
+}
+
+double Object::get_ky() const
+{
+    return this->ky;
+}
+
+double Object::get_kz() const
+{
+    return this->kz;
+}
+
+double Object::get_phi_x() const
+{
+    return this->phi_x;
+}
+
+double Object::get_phi_y() const
+{
+    return this->phi_y;
+}
+
+double Object::get_phi_z() const
+{
+    return this->phi_z;
+}
+
+void Object::set_kx(double kx)
+{
+    this->kx = kx;
+}
+
+void Object::set_ky(double ky)
+{
+    this->ky = ky;
+}
+
+void Object::set_kz(double kz)
+{
+    this->kz = kz;
+}
+
+void Object::set_dx(double dx)
+{
+    this->dx = dx;
+}
+
+void Object::set_dy(double dy)
+{
+    this->dy = dy;
+}
+
+void Object::set_dz(double dz)
+{
+    this->dz = dz;
+}
+
+void Object::set_phi_x(double phi_x)
+{
+    this->phi_x = phi_x;
+}
+
+void Object::set_phi_y(double phi_y)
+{
+    this->phi_y = phi_y;
+}
+
+void Object::set_phi_z(double phi_z)
+{
+    this->phi_z = phi_z;
 }

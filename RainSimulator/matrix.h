@@ -3,7 +3,10 @@
 
 #define SIZE 4
 
+#include <iostream>
+
 #include "vertex.h"
+#include "object.h"
 
 class Vector4d
 {
@@ -45,33 +48,39 @@ class TranslationMatrix : public BaseMatrix
 {
 public:
     TranslationMatrix();
-    TranslationMatrix(const Vertex &vertex);
+    TranslationMatrix(const Object& object);
 };
 
 class ScaleMatrix : public BaseMatrix
 {
 public:
     ScaleMatrix();
-    ScaleMatrix(const Vertex &vertex);
+    ScaleMatrix(const Object& object);
 };
 
 class RotateMatrix : public BaseMatrix
 {
 public:
     RotateMatrix();
-    RotateMatrix(const Vertex &vertex);
+    RotateMatrix(const Object& object);
+    RotateMatrix(const double phi_x,
+                               const double phi_y,
+                               const double phi_z);
 };
 
 class ViewMatrix : public BaseMatrix
 {
 public:
     ViewMatrix();
+    ViewMatrix(Vertex& eye, Vertex& target,
+               Vertex& up);
 };
 
 class ProjectionMatrix : public BaseMatrix
 {
 public:
-    ProjectionMatrix();
+    ProjectionMatrix(double fov, double aspect,
+                     double znear, double zfar);
 };
 
 #endif // MATRIX_H

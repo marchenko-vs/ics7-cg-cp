@@ -153,7 +153,7 @@ Vector4d BaseMatrix::operator * (const Vector4d &vector)
     return result;
 }
 
-TranslationMatrix::TranslationMatrix(const Vertex &vertex)
+TranslationMatrix::TranslationMatrix(const Object& object)
 {
     for (std::size_t i = 0; i < SIZE; i++)
     {
@@ -166,12 +166,14 @@ TranslationMatrix::TranslationMatrix(const Vertex &vertex)
         }
     }
 
-    this->elements[0][3] = vertex.dx;
-    this->elements[1][3] = vertex.dy;
-    this->elements[2][3] = vertex.dz;
+    this->elements[0][3] = object.get_dx();
+    this->elements[1][3] = object.get_dy();
+    this->elements[2][3] = object.get_dz();
 }
 
-RotateMatrix::RotateMatrix(const Vertex &vertex)
+RotateMatrix::RotateMatrix(const double phi_x,
+                           const double phi_y,
+                           const double phi_z)
 {
     BaseMatrix rotate_x, rotate_y, rotate_z;
     BaseMatrix result;
@@ -185,7 +187,6 @@ RotateMatrix::RotateMatrix(const Vertex &vertex)
                 rotate_x.elements[i][j] = 1.0;
                 rotate_y.elements[i][j] = 1.0;
                 rotate_z.elements[i][j] = 1.0;
-
                 this->elements[i][j] = 1.0;
             }
             else
@@ -193,26 +194,25 @@ RotateMatrix::RotateMatrix(const Vertex &vertex)
                 rotate_x.elements[i][j] = 0.0;
                 rotate_y.elements[i][j] = 0.0;
                 rotate_z.elements[i][j] = 0.0;
-
                 this->elements[i][j] = 0.0;
             }
         }
     }
 
-    rotate_x.elements[1][1] = cos(vertex.phi_x);
-    rotate_x.elements[1][2] = -sin(vertex.phi_x);
-    rotate_x.elements[2][2] = cos(vertex.phi_x);
-    rotate_x.elements[2][1] = sin(vertex.phi_x);
+    rotate_x.elements[1][1] = cos(phi_x);
+    rotate_x.elements[1][2] = -sin(phi_x);
+    rotate_x.elements[2][2] = cos(phi_x);
+    rotate_x.elements[2][1] = sin(phi_x);
 
-    rotate_y.elements[0][0] = cos(vertex.phi_y);
-    rotate_y.elements[0][2] = sin(vertex.phi_y);
-    rotate_y.elements[2][2] = cos(vertex.phi_y);
-    rotate_y.elements[2][0] = -sin(vertex.phi_y);
+    rotate_y.elements[0][0] = cos(phi_y);
+    rotate_y.elements[0][2] = sin(phi_y);
+    rotate_y.elements[2][2] = cos(phi_y);
+    rotate_y.elements[2][0] = -sin(phi_y);
 
-    rotate_z.elements[0][0] = cos(vertex.phi_z);
-    rotate_z.elements[0][1] = -sin(vertex.phi_z);
-    rotate_z.elements[1][1] = cos(vertex.phi_z);
-    rotate_z.elements[1][0] = sin(vertex.phi_z);
+    rotate_z.elements[0][0] = cos(phi_z);
+    rotate_z.elements[0][1] = -sin(phi_z);
+    rotate_z.elements[1][1] = cos(phi_z);
+    rotate_z.elements[1][0] = sin(phi_z);
 
     result = rotate_x * rotate_y * rotate_z;
 
@@ -221,19 +221,68 @@ RotateMatrix::RotateMatrix(const Vertex &vertex)
             this->elements[i][j] = result.elements[i][j];
 }
 
-ScaleMatrix::ScaleMatrix(const Vertex &vertex)
+RotateMatrix::RotateMatrix(const Object& object)
+{
+    BaseMatrix rotate_x, rotate_y, rotate_z;
+    BaseMatrix result;
+
+    for (std::size_t i = 0; i < SIZE; i++)
+    {
+        for (std::size_t j = 0; j < SIZE; j++)
+        {
+            if (i == j)
+            {
+                rotate_x.elements[i][j] = 1.0;
+                rotate_y.elements[i][j] = 1.0;
+                rotate_z.elements[i][j] = 1.0;
+                this->elements[i][j] = 1.0;
+            }
+            else
+            {
+                rotate_x.elements[i][j] = 0.0;
+                rotate_y.elements[i][j] = 0.0;
+                rotate_z.elements[i][j] = 0.0;
+                this->elements[i][j] = 0.0;
+            }
+        }
+    }
+
+    rotate_x.elements[1][1] = cos(object.get_phi_x());
+    rotate_x.elements[1][2] = -sin(object.get_phi_x());
+    rotate_x.elements[2][2] = cos(object.get_phi_x());
+    rotate_x.elements[2][1] = sin(object.get_phi_x());
+
+    rotate_y.elements[0][0] = cos(object.get_phi_y());
+    rotate_y.elements[0][2] = sin(object.get_phi_y());
+    rotate_y.elements[2][2] = cos(object.get_phi_y());
+    rotate_y.elements[2][0] = -sin(object.get_phi_y());
+
+    rotate_z.elements[0][0] = cos(object.get_phi_z());
+    rotate_z.elements[0][1] = -sin(object.get_phi_z());
+    rotate_z.elements[1][1] = cos(object.get_phi_z());
+    rotate_z.elements[1][0] = sin(object.get_phi_z());
+
+    result = rotate_x * rotate_y * rotate_z;
+
+    for (std::size_t i = 0; i < SIZE; i++)
+        for (std::size_t j = 0; j < SIZE; j++)
+            this->elements[i][j] = result.elements[i][j];
+}
+
+ScaleMatrix::ScaleMatrix(const Object& object)
 {
     for (std::size_t i = 0; i < SIZE; i++)
         for (std::size_t j = 0; j < SIZE; j++)
             this->elements[i][j] = 0.0;
 
-    this->elements[0][0] = vertex.kx;
-    this->elements[1][1] = vertex.ky;
-    this->elements[2][2] = vertex.kz;
+    this->elements[0][0] = object.get_kx();
+    this->elements[1][1] = object.get_ky();
+    this->elements[2][2] = object.get_kz();
     this->elements[3][3] = 1.0;
 }
 
-ViewMatrix::ViewMatrix()
+ViewMatrix::ViewMatrix(Vertex& eye, Vertex& target,
+                       Vertex& up)
 {
     for (std::size_t i = 0; i < SIZE; i++)
     {
@@ -246,46 +295,47 @@ ViewMatrix::ViewMatrix()
         }
     }
 
-    this->elements[0][3] = 0.0;
-    this->elements[1][3] = 0.0;
-    this->elements[2][3] = 1.0;
-    this->elements[3][3] = 0.0;
+    Vertex forward = target - eye;
+    forward.normalize();
+    Vertex result2 = up ^ forward;
+    result2.normalize();
+    Vertex result3 = forward ^ result2;
+    result3.normalize();
 
-//    this->elements[0][0] = 0.0;
-//    this->elements[0][1] = 3.0;
-//    this->elements[0][2] = -5.0;
-//    this->elements[0][3] = 0.0;
+    this->elements[0][0] = result2.x;
+    this->elements[1][0] = result2.y;
+    this->elements[2][0] = result2.z;
 
-//    this->elements[1][0] = 0.0;
-//    this->elements[1][1] = 0.0;
-//    this->elements[1][2] = 0.0;
-//    this->elements[1][3] = 0.0;
+    this->elements[0][1] = result3.x;
+    this->elements[1][1] = result3.y;
+    this->elements[2][1] = result3.z;
 
-//    this->elements[2][0] = 0.0;
-//    this->elements[2][1] = 1.0;
-//    this->elements[2][2] = 0.0;
-//    this->elements[2][3] = 0.0;
+    this->elements[0][2] = forward.x;
+    this->elements[1][2] = forward.y;
+    this->elements[2][2] = forward.z;
 
-//    this->elements[3][0] = 0.0;
-//    this->elements[3][1] = 0.0;
-//    this->elements[3][2] = 0.0;
-//    this->elements[3][3] = 1.0;
+    this->elements[3][0] = result2 * eye;
+    this->elements[3][1] = result3 * eye;
+    this->elements[3][2] = forward * eye;
+
+    this->elements[3][0] = -this->elements[3][0];
+    this->elements[3][1] = -this->elements[3][1];
+    this->elements[3][2] = -this->elements[3][2];
 }
 
-ProjectionMatrix::ProjectionMatrix()
+ProjectionMatrix::ProjectionMatrix(double fov, double aspect,
+                                   double znear, double zfar)
 {
-    double phi = 130.0 * 3.14 / 180 / 2;
-    int n = 1, f = 2;
-    double ratio = 1.0;
+    double num1 = (double)(1.0 / tan(fov * 0.5));
+    double num2 = zfar / (zfar - znear);
 
     for (std::size_t i = 0; i < SIZE; i++)
         for (std::size_t j = 0; j < SIZE; j++)
             this->elements[i][j] = 0.0;
 
-    this->elements[0][0] = ratio / tan(phi);
-    this->elements[1][1] = ratio / tan(phi);
-    this->elements[2][2] = f / (f - n);
-
-    this->elements[2][3] = -n * (f - n);
-    this->elements[3][2] = ratio;
+    this->elements[0][0] = num1 / aspect;
+    this->elements[1][1] = num1;
+    this->elements[2][2] = num2;
+    this->elements[2][3] = 1.0;
+    this->elements[3][2] = -num2 * znear;;
 }

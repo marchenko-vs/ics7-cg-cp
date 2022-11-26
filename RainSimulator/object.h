@@ -10,6 +10,8 @@
 #include "vertex.h"
 #include "face.h"
 
+extern Vertex eye;
+
 class Object
 {
 public:
@@ -22,21 +24,46 @@ public:
     void draw(const std::size_t width, const std::size_t height,
               uint8_t red, uint8_t green, uint8_t blue, QImage *scene);
 
-    void translate(double dx, double dy, double dz);
-    void scale(double kx, double ky, double kz);
-    void rotate(double phi_x, double phi_y, double phi_z);
-
     std::size_t getVerticesNumber() const;
     std::size_t getFacesNumber() const;
 
     Vertex getVertex(std::size_t number) const;
     face_t getFace(std::size_t number) const;
 
+    double get_dx() const;
+    double get_dy() const;
+    double get_dz() const;
+    double get_kx() const;
+    double get_ky() const;
+    double get_kz() const;
+    double get_phi_x() const;
+    double get_phi_y() const;
+    double get_phi_z() const;
+
+    void set_dx(double dx);
+    void set_dy(double dy);
+    void set_dz(double dz);
+    void set_kx(double kx);
+    void set_ky(double ky);
+    void set_kz(double kz);
+    void set_phi_x(double phi_x);
+    void set_phi_y(double phi_y);
+    void set_phi_z(double phi_z);
+
+    void translate(double dx, double dy, double dz);
+    void rotate(double phi_x, double phi_y, double phi_z);
+    void scale(double kx, double ky, double kz);
+
     ~Object();
 
 public:
     std::vector<Vertex> vertices;
     std::vector<face_t> faces;
+
+private:
+    double dx, dy, dz;
+    double kx, ky, kz;
+    double phi_x, phi_y, phi_z;
 };
 
 class Ground : public Object

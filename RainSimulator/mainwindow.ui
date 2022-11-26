@@ -38,7 +38,7 @@
       <x>10</x>
       <y>10</y>
       <width>710</width>
-      <height>710</height>
+      <height>640</height>
      </rect>
     </property>
    </widget>
@@ -104,6 +104,14 @@
     <bool>false</bool>
    </attribute>
   </widget>
+  <action name="action_rotate_x">
+   <property name="text">
+    <string>rotate_x</string>
+   </property>
+   <property name="shortcut">
+    <string>A</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
