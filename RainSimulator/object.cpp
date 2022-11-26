@@ -13,7 +13,8 @@
 #include <QDebug>
 #include <QImage>
 
-Vertex eye = Vertex(0, 0, -15);
+Vertex light_dir = { 0, 0, -1 };
+Vertex from = Vertex(0, 0, 1);
 
 Object::Object()
 {
@@ -61,7 +62,7 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
         int segment_height = second_half ? t2.y - t1.y : t1.y - t0.y;
 
         double alpha = (double)i / total_height;
-        double beta  = (double)(i - (second_half ? t1.y - t0.y : 0)) / segment_height; // be careful: with above conditions no division by zero here
+        double beta  = (double)(i - (second_half ? t1.y - t0.y : 0)) / segment_height;
 
         Vertex A = t0 + (t2 - t0) * alpha;
         Vertex B = second_half ? t1 + (t2 - t1) * beta : t0 + (t1 - t0) * beta;
@@ -82,7 +83,7 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
             if (z_buffer[k] < P.z)
             {
                 z_buffer[k] = P.z;
-                scene->setPixel(P.x, P.y, color.rgb());
+                scene->setPixel(P.x, HEIGHT - P.y - 1, color.rgb());
             }
         }
     }
@@ -91,21 +92,19 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
 void Object::draw(const std::size_t width, const std::size_t height,
                   uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
 {
-    int *z_buffer = new int[width * height];
-
-    for (std::size_t i = 0; i < width * height; i++)
-        z_buffer[i] = 0;
-
     Vertex target = Vertex(0, 0, 0);
     Vertex up = Vertex(0, 1, 0);
 
-    TranslationMatrix translation_matrix = TranslationMatrix(*this);
-    ScaleMatrix scale_matrix = ScaleMatrix(*this);
-    RotateMatrix rotation_matrix = RotateMatrix(*this);
+    Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
+    Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
+    Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
 
-    ViewMatrix view_matrix = ViewMatrix(eye, target, up);
-    ProjectionMatrix projection_matrix = ProjectionMatrix(0.8, (double)WIDTH / (double)HEIGHT,
-                                                          0.1, 1.0);
+    Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
+    Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
+    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
+                                                           0.1, 1.0);
+
+    Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
 
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
@@ -119,46 +118,36 @@ void Object::draw(const std::size_t width, const std::size_t height,
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
 
-        vec4d_0 = projection_matrix * view_matrix * translation_matrix *
-                rotation_matrix * scale_matrix * vec4d_0;
-        vec4d_1 = projection_matrix * view_matrix * translation_matrix *
-                rotation_matrix * scale_matrix * vec4d_1;
-        vec4d_2 = projection_matrix * view_matrix * translation_matrix *
-                rotation_matrix * scale_matrix * vec4d_2;
+        vec4d_0 = mvp_matrix * vec4d_0;
+        vec4d_1 = mvp_matrix * vec4d_1;
+        vec4d_2 = mvp_matrix * vec4d_2;
 
-        int x_0 = (vec4d_0.x + 0.0) * WIDTH + WIDTH / 2.0;
-        int y_0 = (vec4d_0.y + 0.0) * HEIGHT + HEIGHT / 2.0;
-        int z_0 = vec4d_0.z;
+        int x_0 = round((vec4d_0.x + 1) * WIDTH / 2.0);
+        int y_0 = round((vec4d_0.y + 1) * HEIGHT / 2.0);
+        int z_0 = round((vec4d_0.z + 1) * DEPTH / 2.0);
 
-        int x_1 = (vec4d_1.x + 0.0) * WIDTH + WIDTH / 2.0;
-        int y_1 = (vec4d_1.y + 0.0) * HEIGHT + HEIGHT / 2.0;
-        int z_1 = vec4d_1.z;
+        int x_1 = round((vec4d_1.x + 1) * WIDTH / 2.0);
+        int y_1 = round((vec4d_1.y + 1) * HEIGHT / 2.0);
+        int z_1 = round((vec4d_1.z + 1) * DEPTH / 2.0);
 
-        int x_2 = (vec4d_2.x + 0.0) * WIDTH + WIDTH / 2.0;
-        int y_2 = (vec4d_2.y + 0.0) * HEIGHT + HEIGHT / 2.0;
-        int z_2 = vec4d_2.z + 0.0;
+        int x_2 = round((vec4d_2.x + 1) * WIDTH / 2.0);
+        int y_2 = round((vec4d_2.y + 1) * HEIGHT / 2.0);
+        int z_2 = round((vec4d_2.z + 1) * DEPTH / 2.0);
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
         Vertex t_2 = { x_2, y_2, z_2 };
 
         Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
-        Vertex light_dir = { 1, 1, -1 };
 
         normal.normalize();
         light_dir.normalize();
 
         double intensity = normal * light_dir;
 
-        if (intensity > 0)
-            triangle(t_0, t_1, t_2, width, z_buffer, scene,
-                     QColor(intensity * red, intensity * green, intensity * blue));
-        else
-            triangle(t_0, t_1, t_2, width, z_buffer, scene,
-                     QColor(intensity * red, intensity * green, intensity * blue));
+        triangle(t_0, t_1, t_2, width, z_buffer, scene,
+                 QColor(intensity * red, intensity * green, intensity * blue));
     }
-
-    delete[] z_buffer;
 }
 
 Vertex Object::getVertex(std::size_t number) const

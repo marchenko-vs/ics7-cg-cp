@@ -10,7 +10,8 @@
 #include "vertex.h"
 #include "face.h"
 
-extern Vertex eye;
+extern int *z_buffer;
+extern Vertex from;
 
 class Object
 {
@@ -18,7 +19,8 @@ public:
     Object();
     Object(const char *const filename);
 
-    void triangle(Vertex t0, Vertex t1, Vertex t2, const int width, int *z_buffer,
+    void triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
+                  int *z_buffer,
                   QImage *scene, QColor color);
 
     void draw(const std::size_t width, const std::size_t height,

@@ -100,16 +100,16 @@ void Vector4d::normalize(void)
     this->w /= vector_length;
 }
 
-BaseMatrix::BaseMatrix()
+Matrix::Matrix()
 {
     for (std::size_t i = 0; i < SIZE; i++)
         for (std::size_t j = 0; j < SIZE; j++)
             this->elements[i][j] = 0.0;
 }
 
-BaseMatrix BaseMatrix::operator * (const BaseMatrix &matrix)
+Matrix Matrix::operator * (const Matrix &matrix)
 {
-    BaseMatrix result;
+    Matrix result;
 
     for (std::size_t i = 0; i < SIZE; i++)
     {
@@ -129,7 +129,7 @@ BaseMatrix BaseMatrix::operator * (const BaseMatrix &matrix)
     return result;
 }
 
-Vector4d BaseMatrix::operator * (const Vector4d &vector)
+Vector4d Matrix::operator * (const Vector4d &vector)
 {
     Vector4d result;
 
@@ -153,189 +153,127 @@ Vector4d BaseMatrix::operator * (const Vector4d &vector)
     return result;
 }
 
-TranslationMatrix::TranslationMatrix(const Object& object)
+Matrix Matrix::getTranslationMatrix(const Object& object)
 {
-    for (std::size_t i = 0; i < SIZE; i++)
-    {
-        for (std::size_t j = 0; j < SIZE; j++)
-        {
-            if (i == j)
-                this->elements[i][j] = 1.0;
-            else
-                this->elements[i][j] = 0.0;
-        }
-    }
+    Matrix result;
 
-    this->elements[0][3] = object.get_dx();
-    this->elements[1][3] = object.get_dy();
-    this->elements[2][3] = object.get_dz();
+    for (std::size_t i = 0; i < SIZE; i++)
+        for (std::size_t j = 0; j < SIZE; j++)
+            if (i == j)
+                result.elements[i][j] = 1.0;
+
+    result.elements[0][3] = object.get_dx();
+    result.elements[1][3] = object.get_dy();
+    result.elements[2][3] = object.get_dz();
+
+    return result;
 }
 
-RotateMatrix::RotateMatrix(const double phi_x,
-                           const double phi_y,
-                           const double phi_z)
+Matrix Matrix::getTranslationMatrix(const double x,
+                                    const double y,
+                                    const double z)
 {
-    BaseMatrix rotate_x, rotate_y, rotate_z;
-    BaseMatrix result;
+    Matrix result;
 
     for (std::size_t i = 0; i < SIZE; i++)
-    {
         for (std::size_t j = 0; j < SIZE; j++)
-        {
             if (i == j)
-            {
-                rotate_x.elements[i][j] = 1.0;
-                rotate_y.elements[i][j] = 1.0;
-                rotate_z.elements[i][j] = 1.0;
-                this->elements[i][j] = 1.0;
-            }
-            else
-            {
-                rotate_x.elements[i][j] = 0.0;
-                rotate_y.elements[i][j] = 0.0;
-                rotate_z.elements[i][j] = 0.0;
-                this->elements[i][j] = 0.0;
-            }
-        }
-    }
+                result.elements[i][j] = 1.0;
 
-    rotate_x.elements[1][1] = cos(phi_x);
-    rotate_x.elements[1][2] = -sin(phi_x);
-    rotate_x.elements[2][2] = cos(phi_x);
-    rotate_x.elements[2][1] = sin(phi_x);
+    result.elements[0][3] = x;
+    result.elements[1][3] = y;
+    result.elements[2][3] = z;
 
-    rotate_y.elements[0][0] = cos(phi_y);
-    rotate_y.elements[0][2] = sin(phi_y);
-    rotate_y.elements[2][2] = cos(phi_y);
-    rotate_y.elements[2][0] = -sin(phi_y);
-
-    rotate_z.elements[0][0] = cos(phi_z);
-    rotate_z.elements[0][1] = -sin(phi_z);
-    rotate_z.elements[1][1] = cos(phi_z);
-    rotate_z.elements[1][0] = sin(phi_z);
-
-    result = rotate_x * rotate_y * rotate_z;
-
-    for (std::size_t i = 0; i < SIZE; i++)
-        for (std::size_t j = 0; j < SIZE; j++)
-            this->elements[i][j] = result.elements[i][j];
+    return result;
 }
 
-RotateMatrix::RotateMatrix(const Object& object)
+Matrix Matrix::getRotationMatrix(const Object& object)
 {
-    BaseMatrix rotate_x, rotate_y, rotate_z;
-    BaseMatrix result;
-
-    for (std::size_t i = 0; i < SIZE; i++)
-    {
-        for (std::size_t j = 0; j < SIZE; j++)
-        {
-            if (i == j)
-            {
-                rotate_x.elements[i][j] = 1.0;
-                rotate_y.elements[i][j] = 1.0;
-                rotate_z.elements[i][j] = 1.0;
-                this->elements[i][j] = 1.0;
-            }
-            else
-            {
-                rotate_x.elements[i][j] = 0.0;
-                rotate_y.elements[i][j] = 0.0;
-                rotate_z.elements[i][j] = 0.0;
-                this->elements[i][j] = 0.0;
-            }
-        }
-    }
+    Matrix rotate_x, rotate_y, rotate_z;
+    Matrix result;
 
     rotate_x.elements[1][1] = cos(object.get_phi_x());
     rotate_x.elements[1][2] = -sin(object.get_phi_x());
     rotate_x.elements[2][2] = cos(object.get_phi_x());
     rotate_x.elements[2][1] = sin(object.get_phi_x());
+    rotate_x.elements[0][0] = 1.0;
+    rotate_x.elements[3][3] = 1.0;
 
     rotate_y.elements[0][0] = cos(object.get_phi_y());
     rotate_y.elements[0][2] = sin(object.get_phi_y());
     rotate_y.elements[2][2] = cos(object.get_phi_y());
     rotate_y.elements[2][0] = -sin(object.get_phi_y());
+    rotate_y.elements[1][1] = 1.0;
+    rotate_y.elements[3][3] = 1.0;
 
     rotate_z.elements[0][0] = cos(object.get_phi_z());
     rotate_z.elements[0][1] = -sin(object.get_phi_z());
     rotate_z.elements[1][1] = cos(object.get_phi_z());
     rotate_z.elements[1][0] = sin(object.get_phi_z());
+    rotate_z.elements[2][2] = 1.0;
+    rotate_z.elements[3][3] = 1.0;
 
     result = rotate_x * rotate_y * rotate_z;
-
-    for (std::size_t i = 0; i < SIZE; i++)
-        for (std::size_t j = 0; j < SIZE; j++)
-            this->elements[i][j] = result.elements[i][j];
+    return result;
 }
 
-ScaleMatrix::ScaleMatrix(const Object& object)
+Matrix Matrix::getScalingMatrix(const Object& object)
 {
-    for (std::size_t i = 0; i < SIZE; i++)
-        for (std::size_t j = 0; j < SIZE; j++)
-            this->elements[i][j] = 0.0;
+    Matrix result;
 
-    this->elements[0][0] = object.get_kx();
-    this->elements[1][1] = object.get_ky();
-    this->elements[2][2] = object.get_kz();
-    this->elements[3][3] = 1.0;
+    result.elements[0][0] = object.get_kx();
+    result.elements[1][1] = object.get_ky();
+    result.elements[2][2] = object.get_kz();
+    result.elements[3][3] = 1.0;
+
+    return result;
 }
 
-ViewMatrix::ViewMatrix(Vertex& eye, Vertex& target,
-                       Vertex& up)
+Matrix Matrix::getLookAtMatrix(Vertex& from, Vertex& to,
+                               Vertex& up)
 {
-    for (std::size_t i = 0; i < SIZE; i++)
-    {
-        for (std::size_t j = 0; j < SIZE; j++)
-        {
-            if (i == j)
-                this->elements[i][j] = 1.0;
-            else
-                this->elements[i][j] = 0.0;
-        }
-    }
+    Matrix result;
 
-    Vertex forward = target - eye;
+    Vertex forward = from - to;
     forward.normalize();
-    Vertex result2 = up ^ forward;
-    result2.normalize();
-    Vertex result3 = forward ^ result2;
-    result3.normalize();
+    Vertex right = up ^ forward;
+    right.normalize();
+    Vertex new_up = forward ^ right;
+    //new_up.normalize();
 
-    this->elements[0][0] = result2.x;
-    this->elements[1][0] = result2.y;
-    this->elements[2][0] = result2.z;
+    result.elements[0][0] = right.x;
+    result.elements[0][1] = right.y;
+    result.elements[0][2] = right.z;
 
-    this->elements[0][1] = result3.x;
-    this->elements[1][1] = result3.y;
-    this->elements[2][1] = result3.z;
+    result.elements[1][0] = new_up.x;
+    result.elements[1][1] = new_up.y;
+    result.elements[1][2] = new_up.z;
 
-    this->elements[0][2] = forward.x;
-    this->elements[1][2] = forward.y;
-    this->elements[2][2] = forward.z;
+    result.elements[2][0] = forward.x;
+    result.elements[2][1] = forward.y;
+    result.elements[2][2] = forward.z;
 
-    this->elements[3][0] = result2 * eye;
-    this->elements[3][1] = result3 * eye;
-    this->elements[3][2] = forward * eye;
+    result.elements[3][0] = from.x;
+    result.elements[3][1] = from.y;
+    result.elements[3][2] = from.z;
+    result.elements[3][3] = 1.0;
 
-    this->elements[3][0] = -this->elements[3][0];
-    this->elements[3][1] = -this->elements[3][1];
-    this->elements[3][2] = -this->elements[3][2];
+    return result;
 }
 
-ProjectionMatrix::ProjectionMatrix(double fov, double aspect,
+Matrix Matrix::getProjectionMatrix(double fov, double aspect,
                                    double znear, double zfar)
 {
-    double num1 = (double)(1.0 / tan(fov * 0.5));
-    double num2 = zfar / (zfar - znear);
+    Matrix result;
 
-    for (std::size_t i = 0; i < SIZE; i++)
-        for (std::size_t j = 0; j < SIZE; j++)
-            this->elements[i][j] = 0.0;
+    double fov_radians = 1.0 / tan(fov * 3.14 / 360);
+    double new_z = -zfar / (zfar - znear);
 
-    this->elements[0][0] = num1 / aspect;
-    this->elements[1][1] = num1;
-    this->elements[2][2] = num2;
-    this->elements[2][3] = 1.0;
-    this->elements[3][2] = -num2 * znear;;
+    result.elements[0][0] = fov_radians / aspect;
+    result.elements[1][1] = fov_radians;
+    result.elements[2][2] = -new_z;
+    result.elements[3][2] = 1.0;
+    result.elements[2][3] = new_z * znear;
+
+    return result;
 }

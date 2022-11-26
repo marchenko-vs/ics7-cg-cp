@@ -27,60 +27,33 @@ public:
     double operator * (const Vector4d &vertex);
 };
 
-class BaseMatrix
+class Matrix
 {
 public:
     double elements[SIZE][SIZE];
 
 public:
-    BaseMatrix();
+    Matrix();
 
-    BaseMatrix operator * (const BaseMatrix &matrix);
+    static Matrix getScalingMatrix(const Object& object);
+    static Matrix getTranslationMatrix(const Object& object);
+    static Matrix getTranslationMatrix(const double x,
+                                        const double y,
+                                        const double z);
+    static Matrix getRotationMatrix(const Object& object);
+
+    static Matrix getLookAtMatrix(Vertex& eye, Vertex& target,
+                                Vertex& up);
+    static Matrix getProjectionMatrix(double fov, double aspect,
+                                       double znear, double zfar);
+
+    Matrix operator * (const Matrix &matrix);
     Vector4d operator * (const Vector4d &vector);
 
-    ~BaseMatrix()
+    ~Matrix()
     {
 
     }
-};
-
-class TranslationMatrix : public BaseMatrix
-{
-public:
-    TranslationMatrix();
-    TranslationMatrix(const Object& object);
-};
-
-class ScaleMatrix : public BaseMatrix
-{
-public:
-    ScaleMatrix();
-    ScaleMatrix(const Object& object);
-};
-
-class RotateMatrix : public BaseMatrix
-{
-public:
-    RotateMatrix();
-    RotateMatrix(const Object& object);
-    RotateMatrix(const double phi_x,
-                               const double phi_y,
-                               const double phi_z);
-};
-
-class ViewMatrix : public BaseMatrix
-{
-public:
-    ViewMatrix();
-    ViewMatrix(Vertex& eye, Vertex& target,
-               Vertex& up);
-};
-
-class ProjectionMatrix : public BaseMatrix
-{
-public:
-    ProjectionMatrix(double fov, double aspect,
-                     double znear, double zfar);
 };
 
 #endif // MATRIX_H

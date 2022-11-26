@@ -4,14 +4,16 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QTimer>
+#include <QDoubleSpinBox>
 
 #include <cstdlib>
 #include <vector>
 
 #include "object.h"
 
-#define WIDTH 700
+#define WIDTH 1010
 #define HEIGHT 630
+#define DEPTH 255
 
 #define NUM_OF_DROPLETS 20
 
