@@ -13,8 +13,8 @@
 #include <QDebug>
 #include <QImage>
 
-Vertex light_dir = { 0, 0, -1 };
-Vertex from = Vertex(0, 0, 1);
+Vertex light_dir = Vertex(DEFAULT_LIGHT_X, DEFAULT_LIGHT_Y, -1);
+Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, 1);
 
 Object::Object()
 {
@@ -39,7 +39,7 @@ Object::~Object()
 
 }
 
-void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
+void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
                       int *z_buffer, QImage *scene, QColor color)
 {
     if (t0.y == t1.y && t0.y == t2.y) // вырожденный полигон
@@ -102,7 +102,7 @@ void Object::draw(const std::size_t width, const std::size_t height,
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
     Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
-                                                           0.1, 1.0);
+                                                           0.1, 2.1);
 
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
 
@@ -145,7 +145,7 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
         double intensity = normal * light_dir;
 
-        triangle(t_0, t_1, t_2, width, z_buffer, scene,
+        draw_polygon(t_0, t_1, t_2, width, z_buffer, scene,
                  QColor(intensity * red, intensity * green, intensity * blue));
     }
 }
@@ -303,7 +303,7 @@ RainDroplet::RainDroplet(const char *const filename)
     this->set_phi_y(0.0);
     this->set_phi_z(0.0);
 
-    //this->scale(-0.9, -0.9, -0.9);
+    this->scale(-0.9, -0.9, -0.9);
 }
 
 Ground::Ground(const char *const filename)

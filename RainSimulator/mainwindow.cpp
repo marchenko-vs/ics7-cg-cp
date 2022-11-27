@@ -31,70 +31,55 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     z_buffer = new int[WIDTH * HEIGHT];
-
-    for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
-        z_buffer[i] = 0;
+    rain_time = 50;
+    droplet_size_slider = 0;
 
     image = new QImage(QSize(WIDTH, HEIGHT), QImage::Format_RGB32);
-    image->fill(mode.rgb());
-
     scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
 
-    QShortcut *press_a = new QShortcut(QKeySequence(Qt::Key_A),this,SLOT(rotate_left()));
-    QShortcut *press_d = new QShortcut(QKeySequence(Qt::Key_D),this,SLOT(rotate_right()));
+    QShortcut *press_d = new QShortcut(QKeySequence(Qt::Key_D), this, SLOT(rotate_right()));
+    QShortcut *press_a = new QShortcut(QKeySequence(Qt::Key_A), this, SLOT(rotate_left()));
+    QShortcut *press_w = new QShortcut(QKeySequence(Qt::Key_W), this, SLOT(rotate_up()));
+    QShortcut *press_s = new QShortcut(QKeySequence(Qt::Key_S), this, SLOT(rotate_down()));
 
-    droplets = new RainDroplet*[2];
+    droplets = new RainDroplet *[NUM_OF_DROPLETS];
 
-    droplets[0] = new RainDroplet("../RainSimulator/obj/african_head.obj");
-    droplets[1] = new RainDroplet("../RainSimulator/obj/african_head.obj");
-    droplets[0]->translate(-1, 0, 0);
-    droplets[1]->translate(1, 0, 0);
-    droplets[0]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
-    droplets[1]->draw(WIDTH, HEIGHT, 100, 53, 155, image);
+    droplets[0] = new RainDroplet("../RainSimulator/obj/droplet.obj");
+    droplets[1] = new RainDroplet("../RainSimulator/obj/droplet.obj");
+    ground = new Ground("../RainSimulator/obj/ground.obj");
 
-//    for (std::size_t i = 1; i < NUM_OF_DROPLETS; i++)
-//    {
-//        droplets[i] = new RainDroplet(*droplets[0]);
-//        droplets[i]->translate(i, i, 0);
-//    }
+    ground->translate(0, -.6, 0);
+    droplets[0]->translate(-.5, 1, 0);
+    droplets[1]->translate(.5, 1, 0);
+    this->render();
 
-//    ground = new Ground("../RainSimulator/obj/droplet.obj");
-//    ground->draw(WIDTH, HEIGHT, 0, 102, 0, image);
-    scene->addPixmap(QPixmap::fromImage(*image));
+    timer = new QTimer();
 
-    //timer = new QTimer();
-
-//    connect(timer, SIGNAL(timeout()), this, SLOT(on_pushButton_clicked()));
-//    timer->start(50);
+    connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
+    timer->start(rain_time);
 }
 
 MainWindow::~MainWindow()
 {
+    delete[] z_buffer;
     delete[] droplets;
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::animate()
 {
-    for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
-        z_buffer[i] = 0;
-    image->fill(mode.rgb());
-//    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
-//        droplets[i]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
-    //ground->draw(WIDTH, HEIGHT, 0, 102, 0, image);
-    //droplets[0]->rotate(10, 10, 10);
-    droplets[0]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
-    droplets[1]->draw(WIDTH, HEIGHT, 100, 53, 155, image);
-    scene->addPixmap(QPixmap::fromImage(*image));
+    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
+        droplets[i]->translate(0, -0.01, 0);
+    this->render();
 }
 
-void MainWindow::rotate_left()
+void MainWindow::render()
 {
     for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
         z_buffer[i] = 0;
     image->fill(mode.rgb());
-    from.x += 0.5;
+    ground->draw(WIDTH, HEIGHT, 0, 102, 0, image);
     droplets[0]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
     droplets[1]->draw(WIDTH, HEIGHT, 100, 53, 155, image);
     scene->addPixmap(QPixmap::fromImage(*image));
@@ -102,21 +87,112 @@ void MainWindow::rotate_left()
 
 void MainWindow::rotate_right()
 {
-    for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
-        z_buffer[i] = 0;
-    image->fill(mode.rgb());
-    from.x -= 0.5;
-    droplets[0]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
-    droplets[1]->draw(WIDTH, HEIGHT, 100, 53, 155, image);
-    scene->addPixmap(QPixmap::fromImage(*image));
+    if (from.x < 8)
+        from.x += 0.1;
+    this->render();
+}
+
+void MainWindow::rotate_left()
+{
+    if (from.x > -8)
+        from.x -= 0.1;
+    this->render();
+}
+
+void MainWindow::rotate_up()
+{
+    if (from.y < 8)
+        from.y += 0.1;
+    this->render();
+}
+
+void MainWindow::rotate_down()
+{
+    if (from.y > -8)
+        from.y -= 0.1;
+    this->render();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     mode = QColor(102, 178, 255);
+    this->render();
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
     mode = QColor(0, 0, 110);
+    this->render();
 }
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    from.x = DEFAULT_FROM_X;
+    from.y = DEFAULT_FROM_Y;
+    this->render();
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    this->rotate_left();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    this->rotate_up();
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    this->rotate_down();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    this->rotate_right();
+}
+
+void MainWindow::on_pushButton_12_clicked()
+{
+    light_dir.x = DEFAULT_LIGHT_X;
+    light_dir.y = DEFAULT_LIGHT_Y;
+    this->render();
+}
+
+void MainWindow::on_pushButton_9_clicked()
+{
+    if (light_dir.y > -8)
+        light_dir.y -= 0.1;
+    this->render();
+}
+
+void MainWindow::on_pushButton_10_clicked()
+{
+    if (light_dir.y < 8)
+        light_dir.y += 0.1;
+    this->render();
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    if (light_dir.x < 8)
+        light_dir.x += 0.1;
+    this->render();
+}
+
+void MainWindow::on_pushButton_11_clicked()
+{
+    if (light_dir.x > -8)
+        light_dir.x -= 0.1;
+    this->render();
+}
+
+void MainWindow::on_horizontalSlider_2_sliderMoved(int position)
+{
+    double new_scale = (position - droplet_size_slider) / 500.0;
+    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
+        droplets[i]->scale(new_scale, new_scale, new_scale);
+    droplet_size_slider = position;
+    this->render();
+}
+

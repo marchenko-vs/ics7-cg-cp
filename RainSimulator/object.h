@@ -12,6 +12,7 @@
 
 extern int *z_buffer;
 extern Vertex from;
+extern Vertex light_dir;
 
 class Object
 {
@@ -19,7 +20,7 @@ public:
     Object();
     Object(const char *const filename);
 
-    void triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
+    void draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
                   int *z_buffer,
                   QImage *scene, QColor color);
 
