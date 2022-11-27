@@ -31,7 +31,7 @@ public:
     std::size_t getFacesNumber() const;
 
     Vertex getVertex(std::size_t number) const;
-    face_t getFace(std::size_t number) const;
+    Face getFace(std::size_t number) const;
 
     double get_dx() const;
     double get_dy() const;
@@ -61,7 +61,7 @@ public:
 
 public:
     std::vector<Vertex> vertices;
-    std::vector<face_t> faces;
+    std::vector<Face> faces;
 
 private:
     double dx, dy, dz;
@@ -76,12 +76,23 @@ public:
     Ground(const char *const filename);
 };
 
+class OriginalRainDroplet : public Object
+{
+public:
+    OriginalRainDroplet();
+    OriginalRainDroplet(const char *const filename);
+};
+
 class RainDroplet : public Object
 {
 public:
     RainDroplet();
-    RainDroplet(const RainDroplet &object);
-    RainDroplet(const char *const filename);
+    RainDroplet(OriginalRainDroplet *object);
+
+    void draw(const std::size_t width, const std::size_t height,
+              uint8_t red, uint8_t green, uint8_t blue, QImage *scene);
+private:
+    OriginalRainDroplet *ptr;
 };
 
 #endif // OBJECT_H

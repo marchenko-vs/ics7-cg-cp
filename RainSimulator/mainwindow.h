@@ -11,17 +11,17 @@
 
 #include "object.h"
 
-#define WIDTH 1005
-#define HEIGHT 635
+#define WIDTH 1000
+#define HEIGHT 670
 #define DEPTH 255
 
-#define DEFAULT_FROM_X 0
-#define DEFAULT_FROM_Y 0
+#define DEFAULT_FROM_X 1
+#define DEFAULT_FROM_Y 1
 
 #define DEFAULT_LIGHT_X 0
 #define DEFAULT_LIGHT_Y 0
 
-#define NUM_OF_DROPLETS 2
+#define NUM_OF_DROPLETS 3375
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,8 +34,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    void render();
 
 private slots:
     void on_pushButton_2_clicked();
@@ -58,21 +56,31 @@ private slots:
     void on_pushButton_8_clicked();
     void on_pushButton_11_clicked();
 
-    void animate();
+    void on_spinBox_valueChanged(int arg1);
+    void on_spinBox_2_valueChanged(int arg1);
+    void on_spinBox_3_valueChanged(int arg1);
+    void on_spinBox_4_valueChanged(int arg1);
 
-    void on_horizontalSlider_2_sliderMoved(int position);
+    void animate();
+    void render();
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QImage *image;
-    QTimer *timer;
+    QTimer *animation_timer;
+    QTimer *rendering_timer;
     QColor mode = QColor(102, 178, 255);
 
     RainDroplet **droplets;
     Ground *ground;
 
     int droplet_size_slider;
+    int previous_time;
+    int previous_size;
+    int previous_dx, previous_dz;
     std::size_t rain_time;
+
+    double dx, dy, dz;
 };
 #endif // MAINWINDOW_H

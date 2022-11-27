@@ -4,6 +4,6 @@
 typedef struct
 {
     int vertices[3];
-} face_t;
+} Face;
 
 #endif // FACE_H

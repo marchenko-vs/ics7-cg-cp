@@ -21,17 +21,9 @@ Object::Object()
 
 }
 
-RainDroplet::RainDroplet()
+OriginalRainDroplet::OriginalRainDroplet()
 {
 
-}
-
-RainDroplet::RainDroplet(const RainDroplet &object)
-{
-    for (std::size_t i = 0; i < object.getVerticesNumber(); i++)
-        this->vertices.push_back(object.vertices[i]);
-    for (std::size_t i = 0; i < object.getFacesNumber(); i++)
-        this->faces.push_back(object.faces[i]);
 }
 
 Object::~Object()
@@ -80,6 +72,9 @@ void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
                     P.y < 0 || P.y >= HEIGHT)
                 continue;
 
+            P.x = j;
+            P.y = t0.y + i;
+
             if (z_buffer[k] < P.z)
             {
                 z_buffer[k] = P.z;
@@ -101,14 +96,14 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
-    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
-                                                           0.1, 2.1);
+    Matrix projection_matrix = Matrix::getProjectionMatrix(100, (double)WIDTH / (double)HEIGHT,
+                                                           0.1, 1.0);
 
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
 
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
-        face_t current_face = this->getFace(i);
+        Face current_face = this->getFace(i);
 
         Vertex v_0 = this->getVertex(current_face.vertices[0]);
         Vertex v_1 = this->getVertex(current_face.vertices[1]);
@@ -122,17 +117,78 @@ void Object::draw(const std::size_t width, const std::size_t height,
         vec4d_1 = mvp_matrix * vec4d_1;
         vec4d_2 = mvp_matrix * vec4d_2;
 
-        int x_0 = round((vec4d_0.x + 1) * WIDTH / 2.0);
-        int y_0 = round((vec4d_0.y + 1) * HEIGHT / 2.0);
-        int z_0 = round((vec4d_0.z + 1) * DEPTH / 2.0);
+        int x_0 = (vec4d_0.x + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.y + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.z + 1) * DEPTH / 2.0;
 
-        int x_1 = round((vec4d_1.x + 1) * WIDTH / 2.0);
-        int y_1 = round((vec4d_1.y + 1) * HEIGHT / 2.0);
-        int z_1 = round((vec4d_1.z + 1) * DEPTH / 2.0);
+        int x_1 = (vec4d_1.x + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.y + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.z + 1) * DEPTH / 2.0;
 
-        int x_2 = round((vec4d_2.x + 1) * WIDTH / 2.0);
-        int y_2 = round((vec4d_2.y + 1) * HEIGHT / 2.0);
-        int z_2 = round((vec4d_2.z + 1) * DEPTH / 2.0);
+        int x_2 = (vec4d_2.x + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.y + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.z + 1) * DEPTH / 2.0;
+
+        Vertex t_0 = { x_0, y_0, z_0 };
+        Vertex t_1 = { x_1, y_1, z_1 };
+        Vertex t_2 = { x_2, y_2, z_2 };
+
+        Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
+
+        normal.normalize();
+        light_dir.normalize();
+
+        double intensity = normal * light_dir;
+
+        draw_polygon(t_0, t_1, t_2, width, z_buffer, scene,
+                 QColor(intensity * red, intensity * green, intensity * blue));
+    }
+}
+
+void RainDroplet::draw(const std::size_t width, const std::size_t height,
+                       uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
+{
+    Vertex target = Vertex(0, 0, 0);
+    Vertex up = Vertex(0, 1, 0);
+
+    Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
+    Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
+    Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
+
+    Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
+    Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
+    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
+                                                           0.1, 2.1);
+
+    Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
+
+    for (std::size_t i = 0; i < this->ptr->getFacesNumber(); i++)
+    {
+        Face current_face = this->ptr->getFace(i);
+
+        Vertex v_0 = this->ptr->getVertex(current_face.vertices[0]);
+        Vertex v_1 = this->ptr->getVertex(current_face.vertices[1]);
+        Vertex v_2 = this->ptr->getVertex(current_face.vertices[2]);
+
+        Vector4d vec4d_0 = Vector4d(v_0);
+        Vector4d vec4d_1 = Vector4d(v_1);
+        Vector4d vec4d_2 = Vector4d(v_2);
+
+        vec4d_0 = mvp_matrix * vec4d_0;
+        vec4d_1 = mvp_matrix * vec4d_1;
+        vec4d_2 = mvp_matrix * vec4d_2;
+
+        int x_0 = (vec4d_0.x + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.y + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.z + 1) * DEPTH / 2.0;
+
+        int x_1 = (vec4d_1.x + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.y + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.z + 1) * DEPTH / 2.0;
+
+        int x_2 = (vec4d_2.x + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.y + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.z + 1) * DEPTH / 2.0;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
@@ -155,7 +211,7 @@ Vertex Object::getVertex(std::size_t number) const
     return this->vertices[number];
 }
 
-face_t Object::getFace(std::size_t number) const
+Face Object::getFace(std::size_t number) const
 {
     return this->faces[number];
 }
@@ -214,7 +270,7 @@ Object::Object(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
+            Face face;
 
             face.vertices[0] = f[0];
             face.vertices[1] = f[1];
@@ -239,7 +295,7 @@ Object::Object(const char *const filename)
     this->set_phi_z(0.0);
 }
 
-RainDroplet::RainDroplet(const char *const filename)
+OriginalRainDroplet::OriginalRainDroplet(const char *const filename)
 {
     std::ifstream input_file;
     input_file.open(filename, std::ifstream::in);
@@ -279,7 +335,7 @@ RainDroplet::RainDroplet(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
+            Face face;
 
             face.vertices[0] = f[0];
             face.vertices[1] = f[1];
@@ -295,15 +351,30 @@ RainDroplet::RainDroplet(const char *const filename)
     this->set_dy(0.0);
     this->set_dz(0.0);
 
-    this->set_kx(1.0);
-    this->set_ky(1.0);
-    this->set_kz(1.0);
+    this->set_kx(.01);
+    this->set_ky(.01);
+    this->set_kz(.01);
 
     this->set_phi_x(0.0);
     this->set_phi_y(0.0);
     this->set_phi_z(0.0);
+}
 
-    this->scale(-0.9, -0.9, -0.9);
+RainDroplet::RainDroplet(OriginalRainDroplet *object)
+{
+    this->ptr = object;
+
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(.005);
+    this->set_ky(.005);
+    this->set_kz(.005);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
 }
 
 Ground::Ground(const char *const filename)
@@ -346,7 +417,7 @@ Ground::Ground(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
+            Face face;
 
             face.vertices[0] = f[0];
             face.vertices[1] = f[1];
@@ -369,9 +440,6 @@ Ground::Ground(const char *const filename)
     this->set_phi_x(0.0);
     this->set_phi_y(0.0);
     this->set_phi_z(0.0);
-
-//    this->rotate(-10, 0, 0);
-//    this->translate(0, -1, 0);
 }
 
 void Object::translate(double dx, double dy, double dz)
