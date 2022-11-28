@@ -1,0 +1,15 @@
+class Vertex
+{
+public:
+    double x, y, z;
+
+    Vertex();
+    Vertex(double x, double y, double z);
+    void normalize(void);
+    Vertex operator + (const Vertex &vertex);
+    Vertex operator - (const Vertex &vertex);
+    Vertex operator * (const double multiplier);
+    Vertex operator ^ (const Vertex &vertex);
+    double operator * (const Vertex &vertex);
+    ~Vertex();
+};
