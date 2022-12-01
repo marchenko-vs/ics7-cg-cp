@@ -14,9 +14,9 @@ Vector4d::Vector4d()
 
 Vector4d::Vector4d(const Vertex &vertex)
 {
-    this->x = vertex.x;
-    this->y = vertex.y;
-    this->z = vertex.z;
+    this->x = vertex.get_x();
+    this->y = vertex.get_y();
+    this->z = vertex.get_z();
     this->w = 1;
 }
 
@@ -241,21 +241,21 @@ Matrix Matrix::getLookAtMatrix(Vertex& from, Vertex& to,
     Vertex new_up = forward ^ right;
     //new_up.normalize();
 
-    result.elements[0][0] = right.x;
-    result.elements[0][1] = right.y;
-    result.elements[0][2] = right.z;
+    result.elements[0][0] = right.get_x();
+    result.elements[0][1] = right.get_y();
+    result.elements[0][2] = right.get_z();
 
-    result.elements[1][0] = new_up.x;
-    result.elements[1][1] = new_up.y;
-    result.elements[1][2] = new_up.z;
+    result.elements[1][0] = new_up.get_x();
+    result.elements[1][1] = new_up.get_y();
+    result.elements[1][2] = new_up.get_z();
 
-    result.elements[2][0] = forward.x;
-    result.elements[2][1] = forward.y;
-    result.elements[2][2] = forward.z;
+    result.elements[2][0] = forward.get_x();
+    result.elements[2][1] = forward.get_y();
+    result.elements[2][2] = forward.get_z();
 
-    result.elements[3][0] = from.x;
-    result.elements[3][1] = from.y;
-    result.elements[3][2] = from.z;
+    result.elements[3][0] = from.get_x();
+    result.elements[3][1] = from.get_y();
+    result.elements[3][2] = from.get_z();
     result.elements[3][3] = 1.0;
 
     return result;

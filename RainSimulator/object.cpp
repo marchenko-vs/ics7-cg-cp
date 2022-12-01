@@ -21,6 +21,16 @@ Object::Object()
 
 }
 
+void Object::addVertex(Vertex vertex)
+{
+    this->vertices.push_back(vertex);
+}
+
+void Object::addFace(const Face face)
+{
+    this->faces.push_back(face);
+}
+
 OriginalRainDroplet::OriginalRainDroplet()
 {
 
@@ -34,51 +44,51 @@ Object::~Object()
 void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
                       int *z_buffer, QImage *scene, QColor color)
 {
-    if (t0.y == t1.y && t0.y == t2.y) // вырожденный полигон
+    if (t0.get_y() == t1.get_y() && t0.get_y() == t2.get_y()) // вырожденный полигон
         return;
 
-    if (t0.y > t1.y)
+    if (t0.get_y() > t1.get_y())
         std::swap(t0, t1);
 
-    if (t0.y > t2.y)
+    if (t0.get_y() > t2.get_y())
         std::swap(t0, t2);
 
-    if (t1.y > t2.y)
+    if (t1.get_y() > t2.get_y())
         std::swap(t1, t2);
 
-    int total_height = t2.y - t0.y;
+    int total_height = t2.get_y() - t0.get_y();
 
     for (int i = 0; i < total_height; i++)
     {
-        bool second_half = i > t1.y - t0.y || t1.y == t0.y;
-        int segment_height = second_half ? t2.y - t1.y : t1.y - t0.y;
+        bool second_half = i > t1.get_y() - t0.get_y() || t1.get_y() == t0.get_y();
+        int segment_height = second_half ? t2.get_y() - t1.get_y() : t1.get_y() - t0.get_y();
 
         double alpha = (double)i / total_height;
-        double beta  = (double)(i - (second_half ? t1.y - t0.y : 0)) / segment_height;
+        double beta  = (double)(i - (second_half ? t1.get_y() - t0.get_y() : 0)) / segment_height;
 
         Vertex A = t0 + (t2 - t0) * alpha;
         Vertex B = second_half ? t1 + (t2 - t1) * beta : t0 + (t1 - t0) * beta;
 
-        if (A.x > B.x)
+        if (A.get_x() > B.get_x())
             std::swap(A, B);
 
-        for (int j = A.x; j <= B.x; j++)
+        for (int j = A.get_x(); j <= B.get_x(); j++)
         {
-            double phi = B.x == A.x ? 1. : (double)(j - A.x) / (double)(B.x - A.x);
+            double phi = B.get_x() == A.get_x() ? 1. : (double)(j - A.get_x()) / (double)(B.get_x() - A.get_x());
             Vertex P = A + (B - A) * phi;
-            int k = P.x + P.y * width;
+            int k = P.get_x() + P.get_y() * width;
 
-            if (P.x < 0 || P.x >= WIDTH ||
-                    P.y < 0 || P.y >= HEIGHT)
+            if (P.get_x() < 0 || P.get_x() >= WIDTH ||
+                    P.get_y() < 0 || P.get_y() >= HEIGHT)
                 continue;
 
-            P.x = j;
-            P.y = t0.y + i;
+            P.set_x(j);
+            P.set_y(t0.get_y() + i);
 
-            if (z_buffer[k] < P.z)
+            if (z_buffer[k] < P.get_z())
             {
-                z_buffer[k] = P.z;
-                scene->setPixel(P.x, HEIGHT - P.y - 1, color.rgb());
+                z_buffer[k] = P.get_z();
+                scene->setPixel(P.get_x(), HEIGHT - P.get_y() - 1, color.rgb());
             }
         }
     }
@@ -103,11 +113,11 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
-        Face current_face = this->getFace(i);
+        Face current_face = Face(this->getFace(i));
 
-        Vertex v_0 = this->getVertex(current_face.vertices[0]);
-        Vertex v_1 = this->getVertex(current_face.vertices[1]);
-        Vertex v_2 = this->getVertex(current_face.vertices[2]);
+        Vertex v_0 = this->getVertex(current_face.getVertex(0));
+        Vertex v_1 = this->getVertex(current_face.getVertex(1));
+        Vertex v_2 = this->getVertex(current_face.getVertex(2));
 
         Vector4d vec4d_0 = Vector4d(v_0);
         Vector4d vec4d_1 = Vector4d(v_1);
@@ -166,9 +176,9 @@ void RainDroplet::draw(const std::size_t width, const std::size_t height,
     {
         Face current_face = this->ptr->getFace(i);
 
-        Vertex v_0 = this->ptr->getVertex(current_face.vertices[0]);
-        Vertex v_1 = this->ptr->getVertex(current_face.vertices[1]);
-        Vertex v_2 = this->ptr->getVertex(current_face.vertices[2]);
+        Vertex v_0 = this->ptr->getVertex(current_face.getVertex(0));
+        Vertex v_1 = this->ptr->getVertex(current_face.getVertex(1));
+        Vertex v_2 = this->ptr->getVertex(current_face.getVertex(2));
 
         Vector4d vec4d_0 = Vector4d(v_0);
         Vector4d vec4d_1 = Vector4d(v_1);
@@ -206,22 +216,22 @@ void RainDroplet::draw(const std::size_t width, const std::size_t height,
     }
 }
 
-Vertex Object::getVertex(std::size_t number) const
+Vertex Object::getVertex(std::size_t number)
 {
     return this->vertices[number];
 }
 
-Face Object::getFace(std::size_t number) const
+Face Object::getFace(std::size_t number)
 {
     return this->faces[number];
 }
 
-std::size_t Object::getVerticesNumber() const
+std::size_t Object::getVerticesNumber()
 {
     return this->vertices.size();
 }
 
-std::size_t Object::getFacesNumber() const
+std::size_t Object::getFacesNumber()
 {
     return this->faces.size();
 }
@@ -229,13 +239,10 @@ std::size_t Object::getFacesNumber() const
 Object::Object(const char *const filename)
 {
     std::ifstream input_file;
-
     input_file.open(filename, std::ifstream::in);
 
     if (input_file.fail())
-    {
         return;
-    }
 
     std::string line;
 
@@ -249,11 +256,13 @@ Object::Object(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
+
+            Vertex v = Vertex(x, y, z);
 
             this->vertices.push_back(v);
         }
@@ -270,12 +279,7 @@ Object::Object(const char *const filename)
                 f.push_back(idx);
             }
 
-            Face face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
+            Face face = Face(f[0], f[1], f[2]);
             this->faces.push_back(face);
         }
     }
@@ -314,13 +318,14 @@ OriginalRainDroplet::OriginalRainDroplet(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
 
-            this->vertices.push_back(v);
+            Vertex v = Vertex(x, y, z);
+            this->addVertex(v);
         }
         else if (!line.compare(0, 2, "f "))
         {
@@ -335,13 +340,8 @@ OriginalRainDroplet::OriginalRainDroplet(const char *const filename)
                 f.push_back(idx);
             }
 
-            Face face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
-            this->faces.push_back(face);
+            Face face = Face(f[0], f[1], f[2]);
+            this->addFace(face);
         }
     }
 
@@ -396,13 +396,14 @@ Ground::Ground(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
 
-            this->vertices.push_back(v);
+            Vertex v = Vertex(x, y, z);
+            this->addVertex(v);
         }
         else if (!line.compare(0, 2, "f "))
         {
@@ -417,13 +418,8 @@ Ground::Ground(const char *const filename)
                 f.push_back(idx);
             }
 
-            Face face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
-            this->faces.push_back(face);
+            Face face = Face(f[0], f[1], f[2]);
+            this->addFace(face);
         }
     }
 

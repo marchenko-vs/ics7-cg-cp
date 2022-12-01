@@ -16,6 +16,51 @@ Vertex::Vertex(double x, double y, double z)
     this->z = z;
 }
 
+double Vertex::get_x() const
+{
+    return this->x;
+}
+
+double Vertex::get_y() const
+{
+    return this->y;
+}
+
+double Vertex::get_z() const
+{
+    return this->z;
+}
+
+void Vertex::set_x(double x)
+{
+    this->x = x;
+}
+
+void Vertex::set_y(double y)
+{
+    this->y = y;
+}
+
+void Vertex::set_z(double z)
+{
+    this->z = z;
+}
+
+void Vertex::change_x(double x)
+{
+    this->x += x;
+}
+
+void Vertex::change_y(double y)
+{
+    this->y += y;
+}
+
+void Vertex::change_z(double z)
+{
+    this->z += z;
+}
+
 Vertex Vertex::operator + (const Vertex &vertex)
 {
     Vertex result;

@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
                                        this, SLOT(rotate_down()));
 
     OriginalRainDroplet *main_droplet =
-            new OriginalRainDroplet("../RainSimulator/obj/rain.obj");
+            new OriginalRainDroplet("../RainSimulator/obj/double_cone.obj");
 
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i] = new RainDroplet(main_droplet);
@@ -135,7 +135,7 @@ void MainWindow::render()
     for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
         z_buffer[i] = 0;
     image->fill(mode.rgb());
-    ground->draw(WIDTH, HEIGHT, 0, 102, 0, image);
+    ground->draw(WIDTH, HEIGHT, 0, 154, 23, image);
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i]->draw(WIDTH, HEIGHT, 51, 153, 255, image);
     scene->addPixmap(QPixmap::fromImage(*image));
@@ -143,48 +143,48 @@ void MainWindow::render()
 
 void MainWindow::rotate_right()
 {
-    if (from.x < 8)
-        from.x += 0.1;
+    if (from.get_x() < 8)
+        from.change_x(0.1);
     this->render();
 }
 
 void MainWindow::rotate_left()
 {
-    if (from.x > -8)
-        from.x -= 0.1;
+    if (from.get_x() > -8)
+        from.change_x(-0.1);
     this->render();
 }
 
 void MainWindow::rotate_up()
 {
-    if (from.y < 8)
-        from.y += 0.1;
+    if (from.get_y() < 8)
+        from.change_y(0.1);
     this->render();
 }
 
 void MainWindow::rotate_down()
 {
-    if (from.y > -8)
-        from.y -= 0.1;
+    if (from.get_y() > -8)
+        from.change_y(-0.1);
     this->render();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    mode = QColor(102, 178, 255);
+    mode = QColor(122, 252, 255);
     this->render();
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    mode = QColor(0, 0, 110);
+    mode = QColor(12, 20, 69);
     this->render();
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    from.x = DEFAULT_FROM_X;
-    from.y = DEFAULT_FROM_Y;
+    from.set_x(DEFAULT_FROM_X);
+    from.set_y(DEFAULT_FROM_Y);
     this->render();
 }
 
@@ -210,36 +210,36 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_12_clicked()
 {
-    light_dir.x = DEFAULT_LIGHT_X;
-    light_dir.y = DEFAULT_LIGHT_Y;
+    light_dir.set_x(DEFAULT_LIGHT_X);
+    light_dir.set_y(DEFAULT_LIGHT_Y);
     this->render();
 }
 
 void MainWindow::on_pushButton_9_clicked()
 {
-    if (light_dir.y > -8)
-        light_dir.y -= 0.1;
+    if (light_dir.get_y() > -8)
+        light_dir.change_y(-0.1);
     this->render();
 }
 
 void MainWindow::on_pushButton_10_clicked()
 {
-    if (light_dir.y < 8)
-        light_dir.y += 0.1;
+    if (light_dir.get_y() < 8)
+        light_dir.change_y(0.1);
     this->render();
 }
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    if (light_dir.x < 8)
-        light_dir.x += 0.1;
+    if (light_dir.get_x() < 8)
+        light_dir.change_x(0.1);
     this->render();
 }
 
 void MainWindow::on_pushButton_11_clicked()
 {
-    if (light_dir.x > -8)
-        light_dir.x -= 0.1;
+    if (light_dir.get_x() > -8)
+        light_dir.change_x(-0.1);
     this->render();
 }
 

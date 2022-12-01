@@ -18,6 +18,7 @@ class Object
 {
 public:
     Object();
+    Object(const Object&) = default;
     Object(const char *const filename);
 
     void draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
@@ -27,11 +28,14 @@ public:
     void draw(const std::size_t width, const std::size_t height,
               uint8_t red, uint8_t green, uint8_t blue, QImage *scene);
 
-    std::size_t getVerticesNumber() const;
-    std::size_t getFacesNumber() const;
+    std::size_t getVerticesNumber();
+    std::size_t getFacesNumber();
 
-    Vertex getVertex(std::size_t number) const;
-    Face getFace(std::size_t number) const;
+    void addVertex(Vertex vertex);
+    void addFace(const Face face);
+
+    Vertex getVertex(std::size_t number);
+    Face getFace(std::size_t number);
 
     double get_dx() const;
     double get_dy() const;
@@ -57,13 +61,12 @@ public:
     void rotate(double phi_x, double phi_y, double phi_z);
     void scale(double kx, double ky, double kz);
 
-    ~Object();
+    ~Object(); 
 
-public:
+private:
     std::vector<Vertex> vertices;
     std::vector<Face> faces;
 
-private:
     double dx, dy, dz;
     double kx, ky, kz;
     double phi_x, phi_y, phi_z;
@@ -91,6 +94,7 @@ public:
 
     void draw(const std::size_t width, const std::size_t height,
               uint8_t red, uint8_t green, uint8_t blue, QImage *scene);
+
 private:
     OriginalRainDroplet *ptr;
 };

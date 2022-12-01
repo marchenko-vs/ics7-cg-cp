@@ -1,11 +1,11 @@
 QT       += core gui
-QT += opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++20
+CONFIG += c++14
 
 SOURCES += \
+    face.cpp \
     main.cpp \
     mainwindow.cpp \
     matrix.cpp \

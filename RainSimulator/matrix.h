@@ -30,9 +30,6 @@ public:
 class Matrix
 {
 public:
-    double elements[SIZE][SIZE];
-
-public:
     Matrix();
 
     static Matrix getScalingMatrix(const Object& object);
@@ -50,10 +47,10 @@ public:
     Matrix operator * (const Matrix &matrix);
     Vector4d operator * (const Vector4d &vector);
 
-    ~Matrix()
-    {
+    ~Matrix() { }
 
-    }
+private:
+    double elements[SIZE][SIZE];
 };
 
 #endif // MATRIX_H

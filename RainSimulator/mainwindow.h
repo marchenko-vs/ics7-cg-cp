@@ -19,7 +19,7 @@
 #define DEFAULT_FROM_Y 1
 
 #define DEFAULT_LIGHT_X 0
-#define DEFAULT_LIGHT_Y 0
+#define DEFAULT_LIGHT_Y -1
 
 #define NUM_OF_DROPLETS 3375
 
@@ -71,7 +71,8 @@ private:
     QImage *image;
     QTimer *animation_timer;
     QTimer *rendering_timer;
-    QColor mode = QColor(102, 178, 255);
+
+    QColor mode = QColor(122, 252, 255);
 
     RainDroplet **droplets;
     Ground *ground;
