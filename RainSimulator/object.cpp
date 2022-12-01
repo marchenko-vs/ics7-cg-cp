@@ -14,7 +14,7 @@
 #include <QImage>
 
 Vertex light_dir = Vertex(DEFAULT_LIGHT_X, DEFAULT_LIGHT_Y, -1);
-Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, 1);
+Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, 4);
 
 Object::Object()
 {

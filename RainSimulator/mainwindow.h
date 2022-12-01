@@ -15,8 +15,8 @@
 #define HEIGHT 670
 #define DEPTH 255
 
-#define DEFAULT_FROM_X 1
-#define DEFAULT_FROM_Y 1
+#define DEFAULT_FROM_X 3
+#define DEFAULT_FROM_Y 2
 
 #define DEFAULT_LIGHT_X 0
 #define DEFAULT_LIGHT_Y -1
