@@ -63,6 +63,7 @@ private slots:
 
     void animate();
     void render();
+    void generateRain();
 
 private:
     Ui::MainWindow *ui;

@@ -96,7 +96,7 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
-    Matrix projection_matrix = Matrix::getProjectionMatrix(100, (double)WIDTH / (double)HEIGHT,
+    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
                                                            0.1, 1.0);
 
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
@@ -119,15 +119,15 @@ void Object::draw(const std::size_t width, const std::size_t height,
 
         int x_0 = (vec4d_0.x + 1) * WIDTH / 2.0;
         int y_0 = (vec4d_0.y + 1) * HEIGHT / 2.0;
-        int z_0 = (vec4d_0.z + 1) * DEPTH / 2.0;
+        int z_0 = (vec4d_0.z + 1) * DEPTH;
 
         int x_1 = (vec4d_1.x + 1) * WIDTH / 2.0;
         int y_1 = (vec4d_1.y + 1) * HEIGHT / 2.0;
-        int z_1 = (vec4d_1.z + 1) * DEPTH / 2.0;
+        int z_1 = (vec4d_1.z + 1) * DEPTH;
 
         int x_2 = (vec4d_2.x + 1) * WIDTH / 2.0;
         int y_2 = (vec4d_2.y + 1) * HEIGHT / 2.0;
-        int z_2 = (vec4d_2.z + 1) * DEPTH / 2.0;
+        int z_2 = (vec4d_2.z + 1) * DEPTH;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
@@ -158,7 +158,7 @@ void RainDroplet::draw(const std::size_t width, const std::size_t height,
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
     Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
-                                                           0.1, 2.1);
+                                                           0.1, 1.0);
 
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
 

@@ -54,15 +54,37 @@ MainWindow::MainWindow(QWidget *parent)
     QShortcut *press_s = new QShortcut(QKeySequence(Qt::Key_S),
                                        this, SLOT(rotate_down()));
 
-    int cube = cbrt(NUM_OF_DROPLETS);
-
-    OriginalRainDroplet *main_droplets =
+    OriginalRainDroplet *main_droplet =
             new OriginalRainDroplet("../RainSimulator/obj/rain.obj");
 
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
-    {
-        droplets[i] = new RainDroplet(main_droplets);
-    }
+        droplets[i] = new RainDroplet(main_droplet);
+
+    ground = new Ground("../RainSimulator/obj/ground.obj");
+
+    ground->translate(0, -.7, 0);
+    this->generateRain();
+    this->render();
+
+    animation_timer = new QTimer();
+
+    connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
+
+    animation_timer->start(rain_time);
+}
+
+MainWindow::~MainWindow()
+{
+    delete animation_timer;
+    delete[] z_buffer;
+    delete[] droplets;
+
+    delete ui;
+}
+
+void MainWindow::generateRain()
+{
+    int cube = cbrt(NUM_OF_DROPLETS);
 
     double init_dx = -0.9;
     double init_dy = 1.0;
@@ -89,26 +111,6 @@ MainWindow::MainWindow(QWidget *parent)
         init_dz = 1.0;
         init_dy -= delta_y;
     }
-
-    ground = new Ground("../RainSimulator/obj/ground.obj");
-
-    ground->translate(0, -.6, 0);
-    this->render();
-
-    animation_timer = new QTimer();
-
-    connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
-
-    animation_timer->start(rain_time);
-}
-
-MainWindow::~MainWindow()
-{
-    delete animation_timer;
-    delete[] z_buffer;
-    delete[] droplets;
-
-    delete ui;
 }
 
 void MainWindow::animate()
