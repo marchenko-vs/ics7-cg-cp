@@ -1,26 +1,10 @@
-#ifndef OBJECT_H
-#define OBJECT_H
-
-#include <vector>
-#include <cstdlib>
-
-#include <QGraphicsScene>
-#include <QImage>
-
-#include "vertex.h"
-#include "face.h"
-
-extern int *z_buffer;
-extern Vertex from;
-extern Vertex light_dir;
-
 class Object
 {
 public:
     Object();
     Object(const Object&) = default;
     Object(const char *const filename);
-    void draw_polygon(Vertex t0, Vertex t1, Vertex t2,
+    void draw_polygon(Vertex t0, Vertex t1, Vertex t2, const int width,
                   int *z_buffer,
                   QImage *scene, QColor color);
     void draw(const std::size_t width, const std::size_t height,
@@ -61,32 +45,3 @@ private:
     double kx, ky, kz;
     double phi_x, phi_y, phi_z;
 };
-
-class Ground : public Object
-{
-public:
-    Ground();
-    Ground(const char *const filename);
-};
-
-class OriginalRainDroplet : public Object
-{
-public:
-    OriginalRainDroplet();
-    OriginalRainDroplet(const char *const filename);
-};
-
-class RainDroplet : public Object
-{
-public:
-    RainDroplet();
-    RainDroplet(OriginalRainDroplet *object);
-
-    void draw(const std::size_t width, const std::size_t height,
-              uint8_t red, uint8_t green, uint8_t blue, QImage *scene);
-
-private:
-    OriginalRainDroplet *ptr;
-};
-
-#endif // OBJECT_H

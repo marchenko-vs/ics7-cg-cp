@@ -10,6 +10,7 @@ SOURCES += \
     mainwindow.cpp \
     matrix.cpp \
     object.cpp \
+    vector4d.cpp \
     vertex.cpp
 
 HEADERS += \
@@ -17,6 +18,7 @@ HEADERS += \
     mainwindow.h \
     matrix.h \
     object.h \
+    vector4d.h \
     vertex.h
 
 FORMS += \

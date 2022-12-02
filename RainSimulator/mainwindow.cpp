@@ -29,22 +29,21 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     z_buffer = new int[WIDTH * HEIGHT];
     droplets = new RainDroplet *[NUM_OF_DROPLETS];
-
     rain_time = 100;
+    correction = 5;
     previous_time = 0;
     previous_size = 0;
     droplet_size_slider = 0;
     dy = -0.3;
     dx = dz = 0.0;
     previous_dx = previous_dz = 0;
-
+    sum_dx_delta = 0.0, sum_dz_delta = 0.0;
+    num_of_rows = cbrt(NUM_OF_DROPLETS);
     image = new QImage(QSize(WIDTH, HEIGHT), QImage::Format_RGB32);
     scene = new QGraphicsScene;
     ui->graphicsView->setScene(scene);
-
     QShortcut *press_d = new QShortcut(QKeySequence(Qt::Key_D),
                                        this, SLOT(rotate_right()));
     QShortcut *press_a = new QShortcut(QKeySequence(Qt::Key_A),
@@ -53,23 +52,17 @@ MainWindow::MainWindow(QWidget *parent)
                                        this, SLOT(rotate_up()));
     QShortcut *press_s = new QShortcut(QKeySequence(Qt::Key_S),
                                        this, SLOT(rotate_down()));
-
     OriginalRainDroplet *main_droplet =
             new OriginalRainDroplet("../RainSimulator/obj/double_cone.obj");
 
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i] = new RainDroplet(main_droplet);
-
     ground = new Ground("../RainSimulator/obj/ground.obj");
-
     ground->translate(0, -.7, 0);
     this->generateRain();
     this->render();
-
     animation_timer = new QTimer();
-
     connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
-
     animation_timer->start(rain_time);
 }
 
@@ -84,12 +77,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::generateRain()
 {
+    bool even = 0;
     int cube = cbrt(NUM_OF_DROPLETS);
-
-    double init_dx = -0.9;
-    double init_dy = 1.0;
-    double init_dz = 1.0;
-
+    double init_dx = -0.8, init_dy = 1.11, init_dz = 0.5;
     double delta_x = 1.5 / (cube - 2);
     double delta_y = 0.05;
     double delta_z = 0.1;
@@ -104,12 +94,25 @@ void MainWindow::generateRain()
                 droplets[i * cube_2 + j * cube + k]->translate(init_dx, init_dy, init_dz);
                 init_dx += delta_x;
             }
-            init_dx = -0.9;
+            if (even)
+                init_dx = -0.8;
+            else
+                init_dx = -0.75;
             init_dz -= delta_z;
         }
-        init_dx = -0.9;
-        init_dz = 1.0;
         init_dy -= delta_y;
+        if (even)
+        {
+            even = 0;
+            init_dx = -0.8;
+            init_dz = 0.5;
+        }
+        else
+        {
+            even = 1;
+            init_dx = -0.75;
+            init_dz = 0.45;
+        }
     }
 }
 
@@ -117,14 +120,13 @@ void MainWindow::animate()
 {
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
     {
-        if (droplets[i]->get_dy() < -0.4)
+        if (droplets[i]->get_dy() < MIN_DROPLETS_Y)
         {
-            //droplets[i]->set_dx(-droplets[i]->get_dx());
+            droplets[i]->set_dx(droplets[i]->get_dx() - sum_dx_delta * correction);
             droplets[i]->set_dy(1);
-            //droplets[i]->set_dz(-droplets[i]->get_dz());
+            droplets[i]->set_dz(droplets[i]->get_dz() - sum_dz_delta * correction);
             continue;
         }
-
         droplets[i]->translate(dx, dy, dz);
     }
     this->render();
@@ -245,6 +247,10 @@ void MainWindow::on_pushButton_11_clicked()
 
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
+    if (arg1 == 4)
+        correction = 5;
+    else if (arg1 == 5)
+        correction = 4;
     if (previous_time - arg1 < 0)
         dy -= 0.01;
     else if (previous_time - arg1 > 0)
@@ -256,20 +262,30 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
 void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
     if (previous_dx - arg1 < 0)
+    {
         dx -= 0.01;
+        sum_dx_delta -= 0.01;
+    }
     else if (previous_dx - arg1 > 0)
+    {
         dx += 0.01;
-
+        sum_dx_delta += 0.01;
+    }
     previous_dx = arg1;
 }
 
 void MainWindow::on_spinBox_3_valueChanged(int arg1)
 {
     if (previous_dz - arg1 < 0)
+    {
         dz += 0.01;
+        sum_dz_delta += 0.01;
+    }
     else if (previous_dz - arg1 > 0)
+    {
         dz -= 0.01;
-
+        sum_dz_delta -= 0.01;
+    }
     previous_dz = arg1;
 }
 
@@ -280,10 +296,8 @@ void MainWindow::on_spinBox_4_valueChanged(int arg1)
         d = 0.001;
     else if (previous_size - arg1 > 0)
         d = -0.001;
-
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i]->scale(d, d, d);
 
     previous_size = arg1;
 }
-

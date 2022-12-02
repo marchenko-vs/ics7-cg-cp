@@ -23,6 +23,8 @@
 
 #define NUM_OF_DROPLETS 3375
 
+#define MIN_DROPLETS_Y -0.4
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -72,7 +74,7 @@ private:
     QTimer *animation_timer;
     QTimer *rendering_timer;
 
-    QColor mode = QColor(122, 252, 255);
+    QColor mode = QColor(12, 20, 69);
 
     RainDroplet **droplets;
     Ground *ground;
@@ -81,7 +83,12 @@ private:
     int previous_time;
     int previous_size;
     int previous_dx, previous_dz;
+    int num_of_rows;
+    int correction;
+
     std::size_t rain_time;
+
+    double sum_dx_delta, sum_dz_delta;
 
     double dx, dy, dz;
 };

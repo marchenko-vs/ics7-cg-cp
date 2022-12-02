@@ -1,3 +1,8 @@
+#ifndef VECTOR4D_H
+#define VECTOR4D_H
+
+#include "vertex.h"
+
 class Vector4d
 {
 public:
@@ -11,8 +16,9 @@ public:
     Vector4d operator * (const double multiplier);
     Vector4d operator ^ (const Vector4d &vertex);
     double operator * (const Vector4d &vertex);
-    ~Vector4d();
 
 public:
     double x, y, z, w;
 };
+
+#endif // VECTOR4D_H
