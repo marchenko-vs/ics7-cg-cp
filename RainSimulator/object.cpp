@@ -55,26 +55,37 @@ void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2,
     if (t1.get_y() > t2.get_y())
         std::swap(t1, t2);
     int total_height = t2.get_y() - t0.get_y();
-    for (int i = 0; i < total_height; i++)
+    for (std::size_t i = 0; i < total_height; i++)
     {
         bool second_half = i > t1.get_y() - t0.get_y() || t1.get_y() == t0.get_y();
-        int segment_height = second_half ? t2.get_y() - t1.get_y() : t1.get_y() - t0.get_y();
+        int segment_height = 0;
+        if (second_half)
+            segment_height = t2.get_y() - t1.get_y();
+        else
+            segment_height = t1.get_y() - t0.get_y();
         double alpha = (double)i / total_height;
         double beta  = (double)(i - (second_half ? t1.get_y() -
                                 t0.get_y() : 0)) / segment_height;
         Vertex A = t0 + (t2 - t0) * alpha;
-        Vertex B = second_half ? t1 + (t2 - t1) * beta : t0 + (t1 - t0) * beta;
+        Vertex B;
+        if (second_half)
+            B = t1 + (t2 - t1) * beta;
+        else
+            B = t0 + (t1 - t0) * beta;
         if (A.get_x() > B.get_x())
             std::swap(A, B);
         for (int j = A.get_x(); j <= B.get_x(); j++)
         {
-            double phi = B.get_x() == A.get_x() ? 1. : (double)(j - A.get_x()) /
-                                                  (double)(B.get_x() - A.get_x());
+            double phi = 0.0;
+            if (B.get_x() == A.get_x())
+                phi = 1.0;
+            else
+                phi = (double)(j - A.get_x()) / (double)(B.get_x() - A.get_x());
             Vertex P = A + (B - A) * phi;
             int k = P.get_x() + P.get_y() * WIDTH;
 
-            if (P.get_x() < 0 || P.get_x() >= WIDTH ||
-                    P.get_y() < 0 || P.get_y() >= HEIGHT)
+            if (P.get_x() < 0 || round(P.get_x()) >= WIDTH ||
+                    P.get_y() < 0 || round(P.get_y()) >= HEIGHT)
                 continue;
             P.set_x(j);
             P.set_y(t0.get_y() + i);
@@ -120,17 +131,17 @@ void Object::draw(const std::size_t width, const std::size_t height,
         vec4d_1 = mvp_matrix * vec4d_1;
         vec4d_2 = mvp_matrix * vec4d_2;
 
-        int x_0 = (vec4d_0.x + 1) * WIDTH / 2.0;
-        int y_0 = (vec4d_0.y + 1) * HEIGHT / 2.0;
-        int z_0 = (vec4d_0.z + 1) * DEPTH;
+        int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
 
-        int x_1 = (vec4d_1.x + 1) * WIDTH / 2.0;
-        int y_1 = (vec4d_1.y + 1) * HEIGHT / 2.0;
-        int z_1 = (vec4d_1.z + 1) * DEPTH;
+        int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
 
-        int x_2 = (vec4d_2.x + 1) * WIDTH / 2.0;
-        int y_2 = (vec4d_2.y + 1) * HEIGHT / 2.0;
-        int z_2 = (vec4d_2.z + 1) * DEPTH;
+        int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
@@ -183,17 +194,17 @@ void RainDroplet::draw(const std::size_t width, const std::size_t height,
         vec4d_1 = mvp_matrix * vec4d_1;
         vec4d_2 = mvp_matrix * vec4d_2;
 
-        int x_0 = (vec4d_0.x + 1) * WIDTH / 2.0;
-        int y_0 = (vec4d_0.y + 1) * HEIGHT / 2.0;
-        int z_0 = (vec4d_0.z + 1) * DEPTH / 2.0;
+        int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
 
-        int x_1 = (vec4d_1.x + 1) * WIDTH / 2.0;
-        int y_1 = (vec4d_1.y + 1) * HEIGHT / 2.0;
-        int z_1 = (vec4d_1.z + 1) * DEPTH / 2.0;
+        int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
 
-        int x_2 = (vec4d_2.x + 1) * WIDTH / 2.0;
-        int y_2 = (vec4d_2.y + 1) * HEIGHT / 2.0;
-        int z_2 = (vec4d_2.z + 1) * DEPTH / 2.0;
+        int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };

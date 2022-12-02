@@ -54,16 +54,16 @@ MainWindow::MainWindow(QWidget *parent)
                                        this, SLOT(rotate_down()));
     OriginalRainDroplet *main_droplet =
             new OriginalRainDroplet("../RainSimulator/obj/double_cone.obj");
-
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i] = new RainDroplet(main_droplet);
     ground = new Ground("../RainSimulator/obj/ground.obj");
+    ground->scale(0.4, 0, 0);
     ground->translate(0, -.7, 0);
     this->generateRain();
     this->render();
     animation_timer = new QTimer();
     connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
-    animation_timer->start(rain_time);
+    //animation_timer->start(rain_time);
 }
 
 MainWindow::~MainWindow()

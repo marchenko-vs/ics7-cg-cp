@@ -36,24 +36,22 @@ Matrix Matrix::operator * (const Matrix &matrix)
 Vector4d Matrix::operator * (const Vector4d &vector)
 {
     Vector4d result;
-
-    result.x = this->elements[0][0] * vector.x +
-               this->elements[0][1] * vector.y +
-               this->elements[0][2] * vector.z +
-               this->elements[0][3] * vector.w;
-    result.y = this->elements[1][0] * vector.x +
-               this->elements[1][1] * vector.y +
-               this->elements[1][2] * vector.z +
-               this->elements[1][3] * vector.w;
-    result.z = this->elements[2][0] * vector.x +
-               this->elements[2][1] * vector.y +
-               this->elements[2][2] * vector.z +
-               this->elements[2][3] * vector.w;
-    result.w = this->elements[3][0] * vector.x +
-               this->elements[3][1] * vector.y +
-               this->elements[3][2] * vector.z +
-               this->elements[3][3] * vector.w;
-
+    result.set_x(this->elements[0][0] * vector.get_x() +
+               this->elements[0][1] * vector.get_y() +
+               this->elements[0][2] * vector.get_z() +
+               this->elements[0][3] * vector.get_w());
+    result.set_y(this->elements[1][0] * vector.get_x() +
+               this->elements[1][1] * vector.get_y() +
+               this->elements[1][2] * vector.get_z() +
+               this->elements[1][3] * vector.get_w());
+    result.set_z(this->elements[2][0] * vector.get_x() +
+               this->elements[2][1] * vector.get_y() +
+               this->elements[2][2] * vector.get_z() +
+               this->elements[2][3] * vector.get_w());
+    result.set_w(this->elements[3][0] * vector.get_x() +
+               this->elements[3][1] * vector.get_y() +
+               this->elements[3][2] * vector.get_z() +
+               this->elements[3][3] * vector.get_w());
     return result;
 }
 

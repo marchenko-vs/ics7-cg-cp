@@ -11,6 +11,46 @@ Vector4d::Vector4d()
     this->w = 1;
 }
 
+double Vector4d::get_x() const
+{
+    return this->x;
+}
+
+double Vector4d::get_y() const
+{
+    return this->y;
+}
+
+double Vector4d::get_z() const
+{
+    return this->z;
+}
+
+double Vector4d::get_w() const
+{
+    return this->w;
+}
+
+void Vector4d::set_x(double x)
+{
+    this->x = x;
+}
+
+void Vector4d::set_y(double y)
+{
+    this->y = y;
+}
+
+void Vector4d::set_z(double z)
+{
+    this->z = z;
+}
+
+void Vector4d::set_w(double w)
+{
+    this->w = w;
+}
+
 Vector4d::Vector4d(const Vertex &vertex)
 {
     this->x = vertex.get_x();

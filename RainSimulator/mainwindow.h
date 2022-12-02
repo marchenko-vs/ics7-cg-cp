@@ -15,8 +15,8 @@
 #define HEIGHT 670
 #define DEPTH 255
 
-#define DEFAULT_FROM_X 3
-#define DEFAULT_FROM_Y 2
+#define DEFAULT_FROM_X 0
+#define DEFAULT_FROM_Y 0
 
 #define DEFAULT_LIGHT_X 0
 #define DEFAULT_LIGHT_Y -1
@@ -80,14 +80,11 @@ private:
     Ground *ground;
 
     int droplet_size_slider;
-    int previous_time;
-    int previous_size;
+    int previous_time, previous_size;
     int previous_dx, previous_dz;
     int num_of_rows;
     int correction;
-
     std::size_t rain_time;
-
     double sum_dx_delta, sum_dz_delta;
 
     double dx, dy, dz;
