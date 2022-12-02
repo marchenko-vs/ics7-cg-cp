@@ -23,7 +23,7 @@
 
 #define NUM_OF_DROPLETS 3375
 
-#define MIN_DROPLETS_Y -0.4
+#define MIN_DROPLETS_Y -0.1
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

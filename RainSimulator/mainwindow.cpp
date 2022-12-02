@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     previous_time = 0;
     previous_size = 0;
     droplet_size_slider = 0;
-    dy = -0.3;
+    dy = -0.1;
     dx = dz = 0.0;
     previous_dx = previous_dz = 0;
     sum_dx_delta = 0.0, sum_dz_delta = 0.0;
@@ -79,7 +79,7 @@ void MainWindow::generateRain()
 {
     bool even = 0;
     int cube = cbrt(NUM_OF_DROPLETS);
-    double init_dx = -0.8, init_dy = 1.11, init_dz = 0.5;
+    double init_dx = -0.4, init_dy = 1.11, init_dz = 1.6;
     double delta_x = 1.5 / (cube - 2);
     double delta_y = 0.05;
     double delta_z = 0.1;
@@ -104,14 +104,14 @@ void MainWindow::generateRain()
         if (even)
         {
             even = 0;
-            init_dx = -0.8;
-            init_dz = 0.5;
+            init_dx = -0.4;
+            init_dz = 1.6;
         }
         else
         {
             even = 1;
-            init_dx = -0.75;
-            init_dz = 0.45;
+            init_dx = -0.35;
+            init_dz = 1.55;
         }
     }
 }
@@ -123,7 +123,7 @@ void MainWindow::animate()
         if (droplets[i]->get_dy() < MIN_DROPLETS_Y)
         {
             droplets[i]->set_dx(droplets[i]->get_dx() - sum_dx_delta * correction);
-            droplets[i]->set_dy(1);
+            droplets[i]->set_dy(.5);
             droplets[i]->set_dz(droplets[i]->get_dz() - sum_dz_delta * correction);
             continue;
         }
@@ -252,9 +252,9 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
     else if (arg1 == 5)
         correction = 4;
     if (previous_time - arg1 < 0)
-        dy -= 0.01;
+        dy -= 0.005;
     else if (previous_time - arg1 > 0)
-        dy += 0.01;
+        dy += 0.005;
 
     previous_time = arg1;
 }
