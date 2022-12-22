@@ -89,6 +89,36 @@ Matrix Matrix::getTranslationMatrix(const double x,
     return result;
 }
 
+Matrix Matrix::getRotationMatrix(const double phi_x, const double phi_y, const double phi_z)
+{
+    Matrix rotate_x, rotate_y, rotate_z;
+    Matrix result;
+
+    rotate_x.elements[1][1] = cos(phi_x);
+    rotate_x.elements[1][2] = -sin(phi_x);
+    rotate_x.elements[2][2] = cos(phi_x);
+    rotate_x.elements[2][1] = sin(phi_x);
+    rotate_x.elements[0][0] = 1.0;
+    rotate_x.elements[3][3] = 1.0;
+
+    rotate_y.elements[0][0] = cos(phi_y);
+    rotate_y.elements[0][2] = sin(phi_y);
+    rotate_y.elements[2][2] = cos(phi_y);
+    rotate_y.elements[2][0] = -sin(phi_y);
+    rotate_y.elements[1][1] = 1.0;
+    rotate_y.elements[3][3] = 1.0;
+
+    rotate_z.elements[0][0] = cos(phi_z);
+    rotate_z.elements[0][1] = -sin(phi_z);
+    rotate_z.elements[1][1] = cos(phi_z);
+    rotate_z.elements[1][0] = sin(phi_z);
+    rotate_z.elements[2][2] = 1.0;
+    rotate_z.elements[3][3] = 1.0;
+
+    result = rotate_x * rotate_y * rotate_z;
+    return result;
+}
+
 Matrix Matrix::getRotationMatrix(const Object& object)
 {
     Matrix rotate_x, rotate_y, rotate_z;

@@ -22,6 +22,8 @@
 #include "object.h"
 #include "matrix.h"
 
+#define rdtscll(val) __asm__ __volatile__("rdtsc" :"=A"(val))
+
 int *z_buffer;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     z_buffer = new int[WIDTH * HEIGHT];
     droplets = new RainDroplet *[NUM_OF_DROPLETS];
     rain_time = 100;
-    correction = 5;
+    correction = 15;
     previous_time = 0;
     previous_size = 0;
     droplet_size_slider = 0;
@@ -53,17 +55,17 @@ MainWindow::MainWindow(QWidget *parent)
     QShortcut *press_s = new QShortcut(QKeySequence(Qt::Key_S),
                                        this, SLOT(rotate_down()));
     OriginalRainDroplet *main_droplet =
-            new OriginalRainDroplet("../RainSimulator/obj/double_cone.obj");
+            new OriginalRainDroplet("obj/double_cone.obj");
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i] = new RainDroplet(main_droplet);
-    ground = new Ground("../RainSimulator/obj/ground.obj");
-    ground->scale(0.4, 0, 0);
+    ground = new Ground("obj/ground.obj");
+    ground->scale(0.2, 0, 0.2);
     ground->translate(0, -.7, 0);
     this->generateRain();
     this->render();
     animation_timer = new QTimer();
     connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
-    //animation_timer->start(rain_time);
+    animation_timer->start(rain_time);
 }
 
 MainWindow::~MainWindow()
@@ -71,21 +73,23 @@ MainWindow::~MainWindow()
     delete animation_timer;
     delete[] z_buffer;
     delete[] droplets;
-
     delete ui;
 }
 
 void MainWindow::generateRain()
 {
+    const double left_x = -1.4;
+    const double up_y = 1.1;
     bool even = 0;
     int cube = cbrt(NUM_OF_DROPLETS);
-    double init_dx = -0.4, init_dy = 1.11, init_dz = 1.6;
-    double delta_x = 1.5 / (cube - 2);
-    double delta_y = 0.05;
-    double delta_z = 0.1;
+    double density = 0.2;
+    double init_dx = left_x, init_dy = up_y, init_dz = 1.6;
+    double delta_x = density;
+    double delta_y = density;
+    double delta_z = density;
     int cube_2 = cube * cube;
-
-    for (std::size_t i = 0; i < cube; i++) // i * N * L + j * L + k
+    double offset = density / 2.0;
+    for (std::size_t i = 0; i < cube; i++)
     {
         for (std::size_t j = 0; j < cube; j++)
         {
@@ -95,22 +99,22 @@ void MainWindow::generateRain()
                 init_dx += delta_x;
             }
             if (even)
-                init_dx = -0.8;
+                init_dx = left_x + offset;
             else
-                init_dx = -0.75;
+                init_dx = left_x;
             init_dz -= delta_z;
         }
         init_dy -= delta_y;
         if (even)
         {
             even = 0;
-            init_dx = -0.4;
+            init_dx = left_x;
             init_dz = 1.6;
         }
         else
         {
             even = 1;
-            init_dx = -0.35;
+            init_dx = left_x + offset;
             init_dz = 1.55;
         }
     }
@@ -118,18 +122,22 @@ void MainWindow::generateRain()
 
 void MainWindow::animate()
 {
+    //std::size_t time_start = 0, time_end = 0;
+    //rdtscll(time_start);
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
     {
         if (droplets[i]->get_dy() < MIN_DROPLETS_Y)
         {
             droplets[i]->set_dx(droplets[i]->get_dx() - sum_dx_delta * correction);
-            droplets[i]->set_dy(.5);
+            droplets[i]->set_dy(1);
             droplets[i]->set_dz(droplets[i]->get_dz() - sum_dz_delta * correction);
             continue;
         }
         droplets[i]->translate(dx, dy, dz);
     }
     this->render();
+    //rdtscll(time_end);
+    //qDebug() << time_end - time_start << "ticks";
 }
 
 void MainWindow::render()
@@ -145,35 +153,31 @@ void MainWindow::render()
 
 void MainWindow::rotate_right()
 {
-    if (from.get_x() < 8)
-        from.change_x(0.1);
+    from.rotate(0.0, 0.1, 0.0);
     this->render();
 }
 
 void MainWindow::rotate_left()
 {
-    if (from.get_x() > -8)
-        from.change_x(-0.1);
+    from.rotate(0.0, -0.1, 0.0);
     this->render();
 }
 
 void MainWindow::rotate_up()
 {
-    if (from.get_y() < 8)
-        from.change_y(0.1);
+    from.rotate(-0.1, 0.0, 0.0);
     this->render();
 }
 
 void MainWindow::rotate_down()
 {
-    if (from.get_y() > -8)
-        from.change_y(-0.1);
+    from.rotate(0.1, 0.0, 0.0);
     this->render();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    mode = QColor(122, 252, 255);
+    mode = QColor(69, 179, 224);
     this->render();
 }
 
@@ -187,6 +191,7 @@ void MainWindow::on_pushButton_4_clicked()
 {
     from.set_x(DEFAULT_FROM_X);
     from.set_y(DEFAULT_FROM_Y);
+    from.set_z(DEFAULT_FROM_Z);
     this->render();
 }
 
@@ -259,20 +264,33 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
     previous_time = arg1;
 }
 
+void MainWindow::on_spinBox_4_valueChanged(int arg1)
+{
+    double d = 0;
+    if (previous_size - arg1 < 0)
+        d = 0.001;
+    else if (previous_size - arg1 > 0)
+        d = -0.001;
+    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
+        droplets[i]->scale(d, d, d);
+    previous_size = arg1;
+}
+
 void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
     if (previous_dx - arg1 < 0)
     {
-        dx -= 0.01;
-        sum_dx_delta -= 0.01;
-    }
-    else if (previous_dx - arg1 > 0)
-    {
         dx += 0.01;
         sum_dx_delta += 0.01;
     }
+    else if (previous_dx - arg1 > 0)
+    {
+        dx -= 0.01;
+        sum_dx_delta -= 0.01;
+    }
     previous_dx = arg1;
 }
+
 
 void MainWindow::on_spinBox_3_valueChanged(int arg1)
 {
@@ -289,15 +307,3 @@ void MainWindow::on_spinBox_3_valueChanged(int arg1)
     previous_dz = arg1;
 }
 
-void MainWindow::on_spinBox_4_valueChanged(int arg1)
-{
-    double d = 0;
-    if (previous_size - arg1 < 0)
-        d = 0.001;
-    else if (previous_size - arg1 > 0)
-        d = -0.001;
-    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
-        droplets[i]->scale(d, d, d);
-
-    previous_size = arg1;
-}

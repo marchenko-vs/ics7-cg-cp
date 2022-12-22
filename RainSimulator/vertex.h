@@ -15,6 +15,7 @@ public:
     void change_x(double x);
     void change_y(double y);
     void change_z(double z);
+    void rotate(const double phi_x, const double phi_y, const double phi_z);
     void normalize(void);
     Vertex operator + (const Vertex &vertex);
     Vertex operator - (const Vertex &vertex);

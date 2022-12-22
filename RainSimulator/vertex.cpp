@@ -1,6 +1,8 @@
 #include <cmath>
 
 #include "vertex.h"
+#include "vector4d.h"
+#include "matrix.h"
 
 Vertex::Vertex()
 {
@@ -119,10 +121,19 @@ void Vertex::normalize(void)
     double vector_length = sqrt(this->x * this->x +
                                 this->y * this->y +
                                 this->z * this->z);
-
     this->x /= vector_length;
     this->y /= vector_length;
     this->z /= vector_length;
+}
+
+void Vertex::rotate(const double phi_x, const double phi_y, const double phi_z)
+{
+    Vector4d vec4d = Vector4d(*this);
+    Matrix result = Matrix::getRotationMatrix(phi_x, phi_y, phi_z);
+    vec4d = result * vec4d;
+    this->set_x(vec4d.get_x());
+    this->set_y(vec4d.get_y());
+    this->set_z(vec4d.get_z());
 }
 
 Vertex::~Vertex()

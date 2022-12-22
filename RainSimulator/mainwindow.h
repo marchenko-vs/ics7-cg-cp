@@ -13,17 +13,19 @@
 
 #define WIDTH 1000
 #define HEIGHT 670
-#define DEPTH 255
+#define DEPTH 256
 
-#define DEFAULT_FROM_X 0
-#define DEFAULT_FROM_Y 0
+#define DEFAULT_FROM_X 0//1
+#define DEFAULT_FROM_Y 0//2
+#define DEFAULT_FROM_Z 7//5
 
 #define DEFAULT_LIGHT_X 0
 #define DEFAULT_LIGHT_Y -1
+#define DEFAULT_LIGHT_Z -1
 
 #define NUM_OF_DROPLETS 3375
 
-#define MIN_DROPLETS_Y -0.1
+#define MIN_DROPLETS_Y -0.3
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -59,13 +61,14 @@ private slots:
     void on_pushButton_11_clicked();
 
     void on_spinBox_valueChanged(int arg1);
-    void on_spinBox_2_valueChanged(int arg1);
-    void on_spinBox_3_valueChanged(int arg1);
     void on_spinBox_4_valueChanged(int arg1);
 
     void animate();
     void render();
     void generateRain();
+
+    void on_spinBox_2_valueChanged(int arg1);
+    void on_spinBox_3_valueChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;

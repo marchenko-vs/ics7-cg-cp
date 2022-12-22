@@ -18,6 +18,7 @@ public:
     static Matrix getTranslationMatrix(const double x,
                                        const double y,
                                        const double z);
+    static Matrix getRotationMatrix(const double phi_x, const double phi_y, const double phi_z);
     static Matrix getRotationMatrix(const Object& object);
     static Matrix getLookAtMatrix(Vertex& eye, Vertex& target,
                                   Vertex& up);

@@ -13,8 +13,10 @@
 #include <QDebug>
 #include <QImage>
 
-Vertex light_dir = Vertex(DEFAULT_LIGHT_X, DEFAULT_LIGHT_Y, -1);
-Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, 4);
+Vertex light_dir = Vertex(DEFAULT_LIGHT_X, DEFAULT_LIGHT_Y, DEFAULT_LIGHT_Z);
+Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, DEFAULT_FROM_Z);
+Vertex target = Vertex(0, 0, 0);
+Vertex up = Vertex(0, 1, 0);
 
 Object::Object()
 {
@@ -101,59 +103,42 @@ void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2,
 void Object::draw(const std::size_t width, const std::size_t height,
                   uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
 {
-    Vertex target = Vertex(0, 0, 0);
-    Vertex up = Vertex(0, 1, 0);
-
     Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
     Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
     Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
-
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
     Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
                                                            0.1, 1.0);
-
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
-
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
         Face current_face = Face(this->getFace(i));
-
         Vertex v_0 = this->getVertex(current_face.getVertex(0));
         Vertex v_1 = this->getVertex(current_face.getVertex(1));
         Vertex v_2 = this->getVertex(current_face.getVertex(2));
-
         Vector4d vec4d_0 = Vector4d(v_0);
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
-
         vec4d_0 = mvp_matrix * vec4d_0;
         vec4d_1 = mvp_matrix * vec4d_1;
         vec4d_2 = mvp_matrix * vec4d_2;
-
         int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
         int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
         int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
-
         int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
         int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
         int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
-
         int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
         int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
         int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
-
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
         Vertex t_2 = { x_2, y_2, z_2 };
-
         Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
-
         normal.normalize();
         light_dir.normalize();
-
         double intensity = normal * light_dir;
-
         draw_polygon(t_0, t_1, t_2, z_buffer, scene,
                      QColor(intensity * red,
                             intensity * green,
@@ -164,44 +149,32 @@ void Object::draw(const std::size_t width, const std::size_t height,
 void RainDroplet::draw(const std::size_t width, const std::size_t height,
                        uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
 {
-    Vertex target = Vertex(0, 0, 0);
-    Vertex up = Vertex(0, 1, 0);
-
     Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
     Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
     Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
-
     Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
     Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
     Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
                                                            0.1, 1.0);
-
     Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
-
     for (std::size_t i = 0; i < this->ptr->getFacesNumber(); i++)
     {
         Face current_face = this->ptr->getFace(i);
-
         Vertex v_0 = this->ptr->getVertex(current_face.getVertex(0));
         Vertex v_1 = this->ptr->getVertex(current_face.getVertex(1));
         Vertex v_2 = this->ptr->getVertex(current_face.getVertex(2));
-
         Vector4d vec4d_0 = Vector4d(v_0);
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
-
         vec4d_0 = mvp_matrix * vec4d_0;
         vec4d_1 = mvp_matrix * vec4d_1;
         vec4d_2 = mvp_matrix * vec4d_2;
-
         int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
         int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
         int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
-
         int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
         int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
         int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
-
         int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
         int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
         int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
