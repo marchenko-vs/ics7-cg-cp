@@ -1,12 +1,15 @@
-void MainWindow::generateRain()
+void MainWindow::generateRain(const double density)
 {
+    const double left_x = -1.4;
+    const double up_y = 1.1;
     bool even = 0;
     int cube = cbrt(NUM_OF_DROPLETS);
-    double init_dx = -0.8, init_dy = 1.11, init_dz = 0.5;
-    double delta_x = 1.5 / (cube - 2);
-    double delta_y = 0.05;
-    double delta_z = 0.1;
+    double init_dx = left_x, init_dy = up_y, init_dz = 1.6;
+    double delta_x = density;
+    double delta_y = density;
+    double delta_z = density;
     int cube_2 = cube * cube;
+    double offset = density / 2.0;
     for (std::size_t i = 0; i < cube; i++)
     {
         for (std::size_t j = 0; j < cube; j++)
@@ -17,23 +20,23 @@ void MainWindow::generateRain()
                 init_dx += delta_x;
             }
             if (even)
-                init_dx = -0.8;
+                init_dx = left_x + offset;
             else
-                init_dx = -0.75;
+                init_dx = left_x;
             init_dz -= delta_z;
         }
         init_dy -= delta_y;
         if (even)
         {
             even = 0;
-            init_dx = -0.8;
-            init_dz = 0.5;
+            init_dx = left_x;
+            init_dz = 1.6;
         }
         else
         {
             even = 1;
-            init_dx = -0.75;
-            init_dz = 0.45;
+            init_dx = left_x + offset;
+            init_dz = 1.55;
         }
     }
 }
