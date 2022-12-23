@@ -118,6 +118,35 @@
       \field{pages}{37}
       \range{pages}{1}
     \endentry
+    \entry{Wang}{article}{}
+      \name{author}{2}{}{%
+        {{hash=5e237af436e6f10ce361899034505377}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Niniane},
+           giveni={N\bibinitperiod}}}%
+        {{hash=e16ab576a632155267180fe85f4a3467}{%
+           family={Wade},
+           familyi={W\bibinitperiod},
+           given={Bretton},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \strng{fullhash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \strng{bibnamehash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \strng{authorbibnamehash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \strng{authornamehash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \strng{authorfullhash}{b415d65a9f9138e347e966f4b3c3dbd1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Microsoft Corporation}
+      \field{title}{Rendering Falling Rain and Snow}
+      \field{year}{2013}
+      \field{pages}{1}
+      \range{pages}{1}
+    \endentry
     \entry{Demin2005}{article}{}
       \name{author}{2}{}{%
         {{hash=4b12afc85cf86410113768fd091fbe1a}{%
@@ -159,8 +188,8 @@
       \strng{authorbibnamehash}{00213bc31385742a3b6975a70212858d}
       \strng{authornamehash}{00213bc31385742a3b6975a70212858d}
       \strng{authorfullhash}{00213bc31385742a3b6975a70212858d}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Comp 163: Computational Geometry}
@@ -181,8 +210,8 @@
       \strng{authorbibnamehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
       \strng{authornamehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
       \strng{authorfullhash}{e0d1bfde0c2da91753f73c54bb4b74c5}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{howpublished}{\url{https://www.3dgep.com/understanding-the-view-matrix}}
@@ -204,8 +233,8 @@
       \strng{authorbibnamehash}{a3364ac9233c7841be56b54da92e584f}
       \strng{authornamehash}{a3364ac9233c7841be56b54da92e584f}
       \strng{authorfullhash}{a3364ac9233c7841be56b54da92e584f}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{Механико-математический факультет МГУ им. М. В. Ломоносова}
