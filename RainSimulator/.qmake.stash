@@ -1,0 +1,21 @@
+QMAKE_CXX.QT_COMPILER_STDCXX = 201703L
+QMAKE_CXX.QMAKE_GCC_MAJOR_VERSION = 11
+QMAKE_CXX.QMAKE_GCC_MINOR_VERSION = 3
+QMAKE_CXX.QMAKE_GCC_PATCH_VERSION = 0
+QMAKE_CXX.COMPILER_MACROS = \
+    QT_COMPILER_STDCXX \
+    QMAKE_GCC_MAJOR_VERSION \
+    QMAKE_GCC_MINOR_VERSION \
+    QMAKE_GCC_PATCH_VERSION
+QMAKE_CXX.INCDIRS = \
+    D:/MSYS2/mingw64/include/c++/11.3.0 \
+    D:/MSYS2/mingw64/include/c++/11.3.0/x86_64-w64-mingw32 \
+    D:/MSYS2/mingw64/include/c++/11.3.0/backward \
+    D:/MSYS2/mingw64/lib/gcc/x86_64-w64-mingw32/11.3.0/include \
+    D:/MSYS2/mingw64/include \
+    D:/MSYS2/mingw64/lib/gcc/x86_64-w64-mingw32/11.3.0/include-fixed
+QMAKE_CXX.LIBDIRS = \
+    D:/MSYS2/mingw64/lib/gcc/x86_64-w64-mingw32/11.3.0 \
+    D:/MSYS2/mingw64/lib/gcc \
+    D:/MSYS2/mingw64/x86_64-w64-mingw32/lib \
+    D:/MSYS2/mingw64/lib

@@ -1,24 +1,14 @@
 #include <cmath>
 
 #include "vertex.h"
+#include "vector4d.h"
+#include "matrix.h"
 
 Vertex::Vertex()
 {
     this->x = 0.0;
     this->y = 0.0;
     this->z = 0.0;
-
-    this->dx = 0.0;
-    this->dy = 0.0;
-    this->dz = 0.0;
-
-    this->kx = 1.0;
-    this->ky = 1.0;
-    this->kz = 1.0;
-
-    this->phi_x = 0.0;
-    this->phi_y = 0.0;
-    this->phi_z = 0.0;
 }
 
 Vertex::Vertex(double x, double y, double z)
@@ -26,18 +16,51 @@ Vertex::Vertex(double x, double y, double z)
     this->x = x;
     this->y = y;
     this->z = z;
+}
 
-    this->dx = 0.0;
-    this->dy = 0.0;
-    this->dz = 0.0;
+double Vertex::get_x() const
+{
+    return this->x;
+}
 
-    this->kx = 1.0;
-    this->ky = 1.0;
-    this->kz = 1.0;
+double Vertex::get_y() const
+{
+    return this->y;
+}
 
-    this->phi_x = 0.0;
-    this->phi_y = 0.0;
-    this->phi_z = 0.0;
+double Vertex::get_z() const
+{
+    return this->z;
+}
+
+void Vertex::set_x(double x)
+{
+    this->x = x;
+}
+
+void Vertex::set_y(double y)
+{
+    this->y = y;
+}
+
+void Vertex::set_z(double z)
+{
+    this->z = z;
+}
+
+void Vertex::change_x(double x)
+{
+    this->x += x;
+}
+
+void Vertex::change_y(double y)
+{
+    this->y += y;
+}
+
+void Vertex::change_z(double z)
+{
+    this->z += z;
 }
 
 Vertex Vertex::operator + (const Vertex &vertex)
@@ -98,10 +121,19 @@ void Vertex::normalize(void)
     double vector_length = sqrt(this->x * this->x +
                                 this->y * this->y +
                                 this->z * this->z);
-
     this->x /= vector_length;
     this->y /= vector_length;
     this->z /= vector_length;
+}
+
+void Vertex::rotate(const double phi_x, const double phi_y, const double phi_z)
+{
+    Vector4d vec4d = Vector4d(*this);
+    Matrix result = Matrix::getRotationMatrix(phi_x, phi_y, phi_z);
+    vec4d = result * vec4d;
+    this->set_x(vec4d.get_x());
+    this->set_y(vec4d.get_y());
+    this->set_z(vec4d.get_z());
 }
 
 Vertex::~Vertex()

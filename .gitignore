@@ -1,4 +1,12 @@
 build*/
 *.exe
 *.o
+*.log
+*.aux
+*.mtl
+*.toc
+*.out
+*.xml
+*.gz
+*.bcf
 

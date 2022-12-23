@@ -13,22 +13,29 @@
 #include <QDebug>
 #include <QImage>
 
+Vertex light_dir = Vertex(DEFAULT_LIGHT_X, DEFAULT_LIGHT_Y, DEFAULT_LIGHT_Z);
+Vertex from = Vertex(DEFAULT_FROM_X, DEFAULT_FROM_Y, DEFAULT_FROM_Z);
+Vertex target = Vertex(0, 0, 0);
+Vertex up = Vertex(0, 1, 0);
+
 Object::Object()
 {
 
 }
 
-RainDroplet::RainDroplet()
+void Object::addVertex(Vertex vertex)
 {
-
+    this->vertices.push_back(vertex);
 }
 
-RainDroplet::RainDroplet(const RainDroplet &object)
+void Object::addFace(const Face face)
 {
-    for (std::size_t i = 0; i < object.getVerticesNumber(); i++)
-        this->vertices.push_back(object.vertices[i]);
-    for (std::size_t i = 0; i < object.getFacesNumber(); i++)
-        this->faces.push_back(object.faces[i]);
+    this->faces.push_back(face);
+}
+
+OriginalRainDroplet::OriginalRainDroplet()
+{
+
 }
 
 Object::~Object()
@@ -36,47 +43,58 @@ Object::~Object()
 
 }
 
-void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
-                      int *z_buffer, QImage *scene, QColor color)
+void Object::draw_polygon(Vertex t0, Vertex t1, Vertex t2,
+                          int *z_buffer, QImage *scene,
+                          QColor color)
 {
-    if (t0.y == t1.y && t0.y == t2.y) // вырожденный полигон
+    if (t0.get_y() == t1.get_y() &&
+        t0.get_y() == t2.get_y())
         return;
-
-    if (t0.y > t1.y)
+    if (t0.get_y() > t1.get_y())
         std::swap(t0, t1);
-
-    if (t0.y > t2.y)
+    if (t0.get_y() > t2.get_y())
         std::swap(t0, t2);
-
-    if (t1.y > t2.y)
+    if (t1.get_y() > t2.get_y())
         std::swap(t1, t2);
-
-    int total_height = t2.y - t0.y;
-
-    for (int i = 0; i < total_height; i++)
+    int total_height = t2.get_y() - t0.get_y();
+    for (std::size_t i = 0; i < total_height; i++)
     {
-        bool second_half = i > t1.y - t0.y || t1.y == t0.y;
-        int segment_height = second_half ? t2.y - t1.y : t1.y - t0.y;
-
+        bool second_half = i > t1.get_y() - t0.get_y() || t1.get_y() == t0.get_y();
+        int segment_height = 0;
+        if (second_half)
+            segment_height = t2.get_y() - t1.get_y();
+        else
+            segment_height = t1.get_y() - t0.get_y();
         double alpha = (double)i / total_height;
-        double beta  = (double)(i - (second_half ? t1.y - t0.y : 0)) / segment_height; // be careful: with above conditions no division by zero here
-
+        double beta  = (double)(i - (second_half ? t1.get_y() -
+                                t0.get_y() : 0)) / segment_height;
         Vertex A = t0 + (t2 - t0) * alpha;
-        Vertex B = second_half ? t1 + (t2 - t1) * beta : t0 + (t1 - t0) * beta;
-
-        if (A.x > B.x)
+        Vertex B;
+        if (second_half)
+            B = t1 + (t2 - t1) * beta;
+        else
+            B = t0 + (t1 - t0) * beta;
+        if (A.get_x() > B.get_x())
             std::swap(A, B);
-
-        for (int j = A.x; j <= B.x; j++)
+        for (int j = A.get_x(); j <= B.get_x(); j++)
         {
-            double phi = B.x == A.x ? 1. : (double)(j - A.x) / (double)(B.x - A.x);
+            double phi = 0.0;
+            if (B.get_x() == A.get_x())
+                phi = 1.0;
+            else
+                phi = (double)(j - A.get_x()) / (double)(B.get_x() - A.get_x());
             Vertex P = A + (B - A) * phi;
-            int k = P.x + P.y * width;
+            int k = P.get_x() + P.get_y() * WIDTH;
 
-            if (z_buffer[k] < P.z)
+            if (P.get_x() < 0 || round(P.get_x()) >= WIDTH ||
+                    P.get_y() < 0 || round(P.get_y()) >= HEIGHT)
+                continue;
+            P.set_x(j);
+            P.set_y(t0.get_y() + i);
+            if (z_buffer[k] < P.get_z())
             {
-                z_buffer[k] = P.z;
-                scene->setPixel(P.x, P.y, color.rgb());
+                z_buffer[k] = P.get_z();
+                scene->setPixel(P.get_x(), HEIGHT - P.get_y() - 1, color.rgb());
             }
         }
     }
@@ -85,104 +103,116 @@ void Object::triangle(Vertex t0, Vertex t1, Vertex t2, const int width,
 void Object::draw(const std::size_t width, const std::size_t height,
                   uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
 {
-    int *z_buffer = new int[width * height];
-
-    for (int i = 0; i < width * height; i++)
-        z_buffer[i] = 0;
-
+    Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
+    Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
+    Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
+    Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
+    Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
+    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
+                                                           0.1, 1.0);
+    Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
     for (std::size_t i = 0; i < this->getFacesNumber(); i++)
     {
-        face_t current_face = this->getFace(i);
-
-        Vertex v_0 = this->getVertex(current_face.vertices[0]);
-        Vertex v_1 = this->getVertex(current_face.vertices[1]);
-        Vertex v_2 = this->getVertex(current_face.vertices[2]);
-
+        Face current_face = Face(this->getFace(i));
+        Vertex v_0 = this->getVertex(current_face.getVertex(0));
+        Vertex v_1 = this->getVertex(current_face.getVertex(1));
+        Vertex v_2 = this->getVertex(current_face.getVertex(2));
         Vector4d vec4d_0 = Vector4d(v_0);
         Vector4d vec4d_1 = Vector4d(v_1);
         Vector4d vec4d_2 = Vector4d(v_2);
+        vec4d_0 = mvp_matrix * vec4d_0;
+        vec4d_1 = mvp_matrix * vec4d_1;
+        vec4d_2 = mvp_matrix * vec4d_2;
+        int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
+        int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
+        int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
+        Vertex t_0 = { x_0, y_0, z_0 };
+        Vertex t_1 = { x_1, y_1, z_1 };
+        Vertex t_2 = { x_2, y_2, z_2 };
+        Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
+        normal.normalize();
+        light_dir.normalize();
+        double intensity = normal * light_dir;
+        draw_polygon(t_0, t_1, t_2, z_buffer, scene,
+                     QColor(intensity * red,
+                            intensity * green,
+                            intensity * blue));
+    }
+}
 
-        TranslationMatrix translation_matrix_0 = TranslationMatrix(v_0);
-        TranslationMatrix translation_matrix_1 = TranslationMatrix(v_1);
-        TranslationMatrix translation_matrix_2 = TranslationMatrix(v_2);
-
-        ScaleMatrix scale_matrix_0 = ScaleMatrix(v_0);
-        ScaleMatrix scale_matrix_1 = ScaleMatrix(v_1);
-        ScaleMatrix scale_matrix_2 = ScaleMatrix(v_2);
-
-        RotateMatrix rotate_matrix_0 = RotateMatrix(v_0);
-        RotateMatrix rotate_matrix_1 = RotateMatrix(v_1);
-        RotateMatrix rotate_matrix_2 = RotateMatrix(v_2);
-
-        ViewMatrix view_matrix = ViewMatrix();
-        ProjectionMatrix projection_matrix = ProjectionMatrix();
-
-        vec4d_0 = projection_matrix * view_matrix * translation_matrix_0 *
-                rotate_matrix_0 * scale_matrix_0 * vec4d_0;
-        vec4d_1 = projection_matrix * view_matrix * translation_matrix_1 *
-                rotate_matrix_1 * scale_matrix_1 * vec4d_1;
-        vec4d_2 = projection_matrix * view_matrix * translation_matrix_2 *
-                rotate_matrix_2 * scale_matrix_2 * vec4d_2;
-
-        int x_0 = (vec4d_0.x + 1.0) * WIDTH / 2.0;
-        int y_0 = (vec4d_0.y + 1.0) * HEIGHT / 2.0;
-        int z_0 = (vec4d_0.z + 1.0) * 255 / 2.0;
-
-        int x_1 = (vec4d_1.x + 1.0) * WIDTH / 2.0;
-        int y_1 = (vec4d_1.y + 1.0) * HEIGHT / 2.0;
-        int z_1 = (vec4d_1.z + 1.0) * 255 / 2.0;
-
-        int x_2 = (vec4d_2.x + 1.0) * WIDTH / 2.0;
-        int y_2 = (vec4d_2.y + 1.0) * HEIGHT / 2.0;
-        int z_2 = (vec4d_2.z + 1.0) * 255 / 2.0;
-
-        if (x_0 > WIDTH || y_0 > HEIGHT ||
-                x_1 > WIDTH || y_1 > HEIGHT ||
-                x_2 > WIDTH || y_2 > HEIGHT ||
-                x_0 < 0 || y_0 < 0 ||
-                                x_1 < 0 || y_1 < 0 ||
-                                x_2 < 0 || y_2 < 0)
-            continue;
+void RainDroplet::draw(const std::size_t width, const std::size_t height,
+                       uint8_t red, uint8_t green, uint8_t blue, QImage *scene)
+{
+    Matrix scaling_matrix = Matrix::getScalingMatrix(*this);
+    Matrix rotation_matrix = Matrix::getRotationMatrix(*this);
+    Matrix translation_matrix = Matrix::getTranslationMatrix(*this);
+    Matrix model_matrix = translation_matrix * rotation_matrix * scaling_matrix;
+    Matrix look_at_matrix = Matrix::getLookAtMatrix(from, target, up);
+    Matrix projection_matrix = Matrix::getProjectionMatrix(90, (double)WIDTH / (double)HEIGHT,
+                                                           0.1, 1.0);
+    Matrix mvp_matrix = projection_matrix * look_at_matrix * model_matrix;
+    for (std::size_t i = 0; i < this->ptr->getFacesNumber(); i++)
+    {
+        Face current_face = this->ptr->getFace(i);
+        Vertex v_0 = this->ptr->getVertex(current_face.getVertex(0));
+        Vertex v_1 = this->ptr->getVertex(current_face.getVertex(1));
+        Vertex v_2 = this->ptr->getVertex(current_face.getVertex(2));
+        Vector4d vec4d_0 = Vector4d(v_0);
+        Vector4d vec4d_1 = Vector4d(v_1);
+        Vector4d vec4d_2 = Vector4d(v_2);
+        vec4d_0 = mvp_matrix * vec4d_0;
+        vec4d_1 = mvp_matrix * vec4d_1;
+        vec4d_2 = mvp_matrix * vec4d_2;
+        int x_0 = (vec4d_0.get_x() + 1) * WIDTH / 2.0;
+        int y_0 = (vec4d_0.get_y() + 1) * HEIGHT / 2.0;
+        int z_0 = (vec4d_0.get_z() + 1) * DEPTH;
+        int x_1 = (vec4d_1.get_x() + 1) * WIDTH / 2.0;
+        int y_1 = (vec4d_1.get_y() + 1) * HEIGHT / 2.0;
+        int z_1 = (vec4d_1.get_z() + 1) * DEPTH;
+        int x_2 = (vec4d_2.get_x() + 1) * WIDTH / 2.0;
+        int y_2 = (vec4d_2.get_y() + 1) * HEIGHT / 2.0;
+        int z_2 = (vec4d_2.get_z() + 1) * DEPTH;
 
         Vertex t_0 = { x_0, y_0, z_0 };
         Vertex t_1 = { x_1, y_1, z_1 };
         Vertex t_2 = { x_2, y_2, z_2 };
 
         Vertex normal = (t_2 - t_0) ^ (t_1 - t_0);
-        Vertex light_dir = { 0, 0, -1 };
 
         normal.normalize();
         light_dir.normalize();
 
         double intensity = normal * light_dir;
 
-        if (intensity > 0)
-            triangle(t_0, t_1, t_2, width, z_buffer, scene,
-                     QColor(intensity * red, intensity * green, intensity * blue));
-        else
-            triangle(t_0, t_1, t_2, width, z_buffer, scene,
-                     QColor(intensity * red, intensity * green, intensity * blue));
+        draw_polygon(t_0, t_1, t_2, z_buffer, scene,
+                     QColor(intensity * red,
+                            intensity * green,
+                            intensity * blue));
     }
-
-    delete[] z_buffer;
 }
 
-Vertex Object::getVertex(std::size_t number) const
+Vertex Object::getVertex(std::size_t number)
 {
     return this->vertices[number];
 }
 
-face_t Object::getFace(std::size_t number) const
+Face Object::getFace(std::size_t number)
 {
     return this->faces[number];
 }
 
-std::size_t Object::getVerticesNumber() const
+std::size_t Object::getVerticesNumber()
 {
     return this->vertices.size();
 }
 
-std::size_t Object::getFacesNumber() const
+std::size_t Object::getFacesNumber()
 {
     return this->faces.size();
 }
@@ -190,13 +220,10 @@ std::size_t Object::getFacesNumber() const
 Object::Object(const char *const filename)
 {
     std::ifstream input_file;
-
     input_file.open(filename, std::ifstream::in);
 
     if (input_file.fail())
-    {
         return;
-    }
 
     std::string line;
 
@@ -210,11 +237,13 @@ Object::Object(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
+
+            Vertex v = Vertex(x, y, z);
 
             this->vertices.push_back(v);
         }
@@ -231,20 +260,27 @@ Object::Object(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
+            Face face = Face(f[0], f[1], f[2]);
             this->faces.push_back(face);
         }
     }
 
     input_file.close();
+
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(1.0);
+    this->set_ky(1.0);
+    this->set_kz(1.0);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
 }
 
-RainDroplet::RainDroplet(const char *const filename)
+OriginalRainDroplet::OriginalRainDroplet(const char *const filename)
 {
     std::ifstream input_file;
     input_file.open(filename, std::ifstream::in);
@@ -263,13 +299,14 @@ RainDroplet::RainDroplet(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
 
-            this->vertices.push_back(v);
+            Vertex v = Vertex(x, y, z);
+            this->addVertex(v);
         }
         else if (!line.compare(0, 2, "f "))
         {
@@ -284,19 +321,41 @@ RainDroplet::RainDroplet(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
-            this->faces.push_back(face);
+            Face face = Face(f[0], f[1], f[2]);
+            this->addFace(face);
         }
     }
 
     input_file.close();
 
-    this->scale(-0.9, -0.9, -0.9);
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(.01);
+    this->set_ky(.01);
+    this->set_kz(.01);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
+}
+
+RainDroplet::RainDroplet(OriginalRainDroplet *object)
+{
+    this->ptr = object;
+
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(.005);
+    this->set_ky(.005);
+    this->set_kz(.005);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
 }
 
 Ground::Ground(const char *const filename)
@@ -318,13 +377,14 @@ Ground::Ground(const char *const filename)
         if (!line.compare(0, 2, "v "))
         {
             iss >> trash;
-            Vertex v;
+            double x, y, z;
 
-            iss >> v.x;
-            iss >> v.y;
-            iss >> v.z;
+            iss >> x;
+            iss >> y;
+            iss >> z;
 
-            this->vertices.push_back(v);
+            Vertex v = Vertex(x, y, z);
+            this->addVertex(v);
         }
         else if (!line.compare(0, 2, "f "))
         {
@@ -339,48 +399,133 @@ Ground::Ground(const char *const filename)
                 f.push_back(idx);
             }
 
-            face_t face;
-
-            face.vertices[0] = f[0];
-            face.vertices[1] = f[1];
-            face.vertices[2] = f[2];
-
-            this->faces.push_back(face);
+            Face face = Face(f[0], f[1], f[2]);
+            this->addFace(face);
         }
     }
 
     input_file.close();
 
-    this->rotate(-10, 0, 0);
-    this->translate(0, -1, 0);
+    this->set_dx(0.0);
+    this->set_dy(0.0);
+    this->set_dz(0.0);
+
+    this->set_kx(1.0);
+    this->set_ky(1.0);
+    this->set_kz(1.0);
+
+    this->set_phi_x(0.0);
+    this->set_phi_y(0.0);
+    this->set_phi_z(0.0);
 }
 
 void Object::translate(double dx, double dy, double dz)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].x += dx;
-        this->vertices[i].y += dy;
-        this->vertices[i].z += dz;
-    }
+    this->dx += dx;
+    this->dy += dy;
+    this->dz += dz;
 }
 
 void Object::scale(double kx, double ky, double kz)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].kx += kx;
-        this->vertices[i].ky += ky;
-        this->vertices[i].kz += kz;
-    }
+    this->kx += kx;
+    this->ky += ky;
+    this->kz += kz;
 }
 
 void Object::rotate(double phi_x, double phi_y, double phi_z)
 {
-    for (std::size_t i = 0; i < this->getVerticesNumber(); i++)
-    {
-        this->vertices[i].phi_x += phi_x * 3.14 / 180;
-        this->vertices[i].phi_y += phi_y * 3.14 / 180;
-        this->vertices[i].phi_z += phi_z * 3.14 / 180;
-    }
+    this->phi_x += phi_x * 3.14 / 180;
+    this->phi_y += phi_y * 3.14 / 180;
+    this->phi_z += phi_z * 3.14 / 180;
+}
+
+double Object::get_dx() const
+{
+    return this->dx;
+}
+
+double Object::get_dy() const
+{
+    return this->dy;
+}
+
+double Object::get_dz() const
+{
+    return this->dz;
+}
+
+double Object::get_kx() const
+{
+    return this->kx;
+}
+
+double Object::get_ky() const
+{
+    return this->ky;
+}
+
+double Object::get_kz() const
+{
+    return this->kz;
+}
+
+double Object::get_phi_x() const
+{
+    return this->phi_x;
+}
+
+double Object::get_phi_y() const
+{
+    return this->phi_y;
+}
+
+double Object::get_phi_z() const
+{
+    return this->phi_z;
+}
+
+void Object::set_kx(double kx)
+{
+    this->kx = kx;
+}
+
+void Object::set_ky(double ky)
+{
+    this->ky = ky;
+}
+
+void Object::set_kz(double kz)
+{
+    this->kz = kz;
+}
+
+void Object::set_dx(double dx)
+{
+    this->dx = dx;
+}
+
+void Object::set_dy(double dy)
+{
+    this->dy = dy;
+}
+
+void Object::set_dz(double dz)
+{
+    this->dz = dz;
+}
+
+void Object::set_phi_x(double phi_x)
+{
+    this->phi_x = phi_x;
+}
+
+void Object::set_phi_y(double phi_y)
+{
+    this->phi_y = phi_y;
+}
+
+void Object::set_phi_z(double phi_z)
+{
+    this->phi_z = phi_z;
 }

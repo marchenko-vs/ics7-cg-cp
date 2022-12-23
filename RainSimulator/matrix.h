@@ -3,75 +3,33 @@
 
 #define SIZE 4
 
+#include <iostream>
+
 #include "vertex.h"
+#include "object.h"
+#include "vector4d.h"
 
-class Vector4d
+class Matrix
 {
 public:
-    double x, y, z, w;
-public:
-    Vector4d();
-    Vector4d(const double x, const double y, const double z,
-             const double w);
-    Vector4d(const Vertex &vertex);
-
-    void normalize(void);
-
-    Vector4d operator + (const Vector4d &vertex);
-    Vector4d operator - (const Vector4d &vertex);
-    Vector4d operator * (const double multiplier);
-    Vector4d operator ^ (const Vector4d &vertex);
-    double operator * (const Vector4d &vertex);
-};
-
-class BaseMatrix
-{
-public:
-    double elements[SIZE][SIZE];
-
-public:
-    BaseMatrix();
-
-    BaseMatrix operator * (const BaseMatrix &matrix);
+    Matrix();
+    static Matrix getScalingMatrix(const Object& object);
+    static Matrix getTranslationMatrix(const Object& object);
+    static Matrix getTranslationMatrix(const double x,
+                                       const double y,
+                                       const double z);
+    static Matrix getRotationMatrix(const double phi_x, const double phi_y, const double phi_z);
+    static Matrix getRotationMatrix(const Object& object);
+    static Matrix getLookAtMatrix(Vertex& eye, Vertex& target,
+                                  Vertex& up);
+    static Matrix getProjectionMatrix(double fov, double aspect,
+                                      double znear, double zfar);
+    Matrix operator * (const Matrix &matrix);
     Vector4d operator * (const Vector4d &vector);
+    ~Matrix() { }
 
-    ~BaseMatrix()
-    {
-
-    }
-};
-
-class TranslationMatrix : public BaseMatrix
-{
-public:
-    TranslationMatrix();
-    TranslationMatrix(const Vertex &vertex);
-};
-
-class ScaleMatrix : public BaseMatrix
-{
-public:
-    ScaleMatrix();
-    ScaleMatrix(const Vertex &vertex);
-};
-
-class RotateMatrix : public BaseMatrix
-{
-public:
-    RotateMatrix();
-    RotateMatrix(const Vertex &vertex);
-};
-
-class ViewMatrix : public BaseMatrix
-{
-public:
-    ViewMatrix();
-};
-
-class ProjectionMatrix : public BaseMatrix
-{
-public:
-    ProjectionMatrix();
+private:
+    double elements[SIZE][SIZE];
 };
 
 #endif // MATRIX_H

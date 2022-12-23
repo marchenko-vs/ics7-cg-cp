@@ -1,0 +1,220 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{Tariq2007}{article}{}
+      \name{author}{1}{}{%
+        {{hash=196695a224f7068f1c07f6f52a5c7801}{%
+           family={Tariq},
+           familyi={T\bibinitperiod},
+           given={Sarah},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{196695a224f7068f1c07f6f52a5c7801}
+      \strng{fullhash}{196695a224f7068f1c07f6f52a5c7801}
+      \strng{bibnamehash}{196695a224f7068f1c07f6f52a5c7801}
+      \strng{authorbibnamehash}{196695a224f7068f1c07f6f52a5c7801}
+      \strng{authornamehash}{196695a224f7068f1c07f6f52a5c7801}
+      \strng{authorfullhash}{196695a224f7068f1c07f6f52a5c7801}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{NVIDIA Corporation}
+      \field{title}{Rain}
+      \field{year}{2007}
+    \endentry
+    \entry{Hao2008}{article}{}
+      \name{author}{1}{}{%
+        {{hash=2eede3a24ef7e8af6ad89b416752886a}{%
+           family={Hao},
+           familyi={H\bibinitperiod},
+           given={Pisith},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{2eede3a24ef7e8af6ad89b416752886a}
+      \strng{fullhash}{2eede3a24ef7e8af6ad89b416752886a}
+      \strng{bibnamehash}{2eede3a24ef7e8af6ad89b416752886a}
+      \strng{authorbibnamehash}{2eede3a24ef7e8af6ad89b416752886a}
+      \strng{authornamehash}{2eede3a24ef7e8af6ad89b416752886a}
+      \strng{authorfullhash}{2eede3a24ef7e8af6ad89b416752886a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Kanwal Rekhi School of Information Technology Indian Institute of Technology}
+      \field{title}{Algorithms for Atmospheric Special Effects in Graphics and their Implementation}
+      \field{year}{2008}
+      \field{pages}{1}
+      \range{pages}{1}
+    \endentry
+    \entry{Garg2006}{article}{}
+      \name{author}{2}{}{%
+        {{hash=31ca05cd3ce3d31313057b3cf34065b9}{%
+           family={Garg},
+           familyi={G\bibinitperiod},
+           given={Kshitiz},
+           giveni={K\bibinitperiod}}}%
+        {{hash=9272cbc8c0135d92b32e936f50633bf2}{%
+           family={Nayar},
+           familyi={N\bibinitperiod},
+           given={Shree\bibnamedelima K.},
+           giveni={S\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{327bfbda98f748d6ca06453a826f0dca}
+      \strng{fullhash}{327bfbda98f748d6ca06453a826f0dca}
+      \strng{bibnamehash}{327bfbda98f748d6ca06453a826f0dca}
+      \strng{authorbibnamehash}{327bfbda98f748d6ca06453a826f0dca}
+      \strng{authornamehash}{327bfbda98f748d6ca06453a826f0dca}
+      \strng{authorfullhash}{327bfbda98f748d6ca06453a826f0dca}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Columbia University}
+      \field{title}{Photorealistic Rendering of Rain Streaks}
+      \field{year}{2006}
+      \field{pages}{996}
+      \range{pages}{1}
+    \endentry
+    \entry{Kuritsina2011}{article}{}
+      \name{author}{1}{}{%
+        {{hash=db293e4e667efa132b754dc6b06a452b}{%
+           family={Курицына},
+           familyi={К\bibinitperiod},
+           given={В.\bibnamedelimi В.},
+           giveni={В\bibinitperiod\bibinitdelim В\bibinitperiod}}}%
+      }
+      \strng{namehash}{db293e4e667efa132b754dc6b06a452b}
+      \strng{fullhash}{db293e4e667efa132b754dc6b06a452b}
+      \strng{bibnamehash}{db293e4e667efa132b754dc6b06a452b}
+      \strng{authorbibnamehash}{db293e4e667efa132b754dc6b06a452b}
+      \strng{authornamehash}{db293e4e667efa132b754dc6b06a452b}
+      \strng{authorfullhash}{db293e4e667efa132b754dc6b06a452b}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Российский государственный технологический университет имени К. Э. Циолковского}
+      \field{title}{Системы автоматизированного проектирования}
+      \field{year}{2011}
+      \field{pages}{37}
+      \range{pages}{1}
+    \endentry
+    \entry{Demin2005}{article}{}
+      \name{author}{2}{}{%
+        {{hash=4b12afc85cf86410113768fd091fbe1a}{%
+           family={Демин},
+           familyi={Д\bibinitperiod},
+           given={А.\bibnamedelimi Ю.},
+           giveni={А\bibinitperiod\bibinitdelim Ю\bibinitperiod}}}%
+        {{hash=49d7efe01803e4aa37d58ffc2665e659}{%
+           family={Кудинов},
+           familyi={К\bibinitperiod},
+           given={А.\bibnamedelimi В.},
+           giveni={А\bibinitperiod\bibinitdelim В\bibinitperiod}}}%
+      }
+      \strng{namehash}{8872a6a7628f11642664aa1fb103e94e}
+      \strng{fullhash}{8872a6a7628f11642664aa1fb103e94e}
+      \strng{bibnamehash}{8872a6a7628f11642664aa1fb103e94e}
+      \strng{authorbibnamehash}{8872a6a7628f11642664aa1fb103e94e}
+      \strng{authornamehash}{8872a6a7628f11642664aa1fb103e94e}
+      \strng{authorfullhash}{8872a6a7628f11642664aa1fb103e94e}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Томский политехнический университет}
+      \field{title}{Компьютерная графика}
+      \field{year}{2005}
+    \endentry
+    \entry{Souvaine2005}{article}{}
+      \name{author}{1}{}{%
+        {{hash=00213bc31385742a3b6975a70212858d}{%
+           family={Souvaine},
+           familyi={S\bibinitperiod},
+           given={Diane},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{00213bc31385742a3b6975a70212858d}
+      \strng{fullhash}{00213bc31385742a3b6975a70212858d}
+      \strng{bibnamehash}{00213bc31385742a3b6975a70212858d}
+      \strng{authorbibnamehash}{00213bc31385742a3b6975a70212858d}
+      \strng{authornamehash}{00213bc31385742a3b6975a70212858d}
+      \strng{authorfullhash}{00213bc31385742a3b6975a70212858d}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Comp 163: Computational Geometry}
+      \field{title}{Line Segment Intersection Using a Sweep Line Algorithm}
+      \field{year}{2005}
+      \field{pages}{7}
+      \range{pages}{1}
+    \endentry
+    \entry{Jeremiah2011}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=e0d1bfde0c2da91753f73c54bb4b74c5}{%
+           family={Jeremiah},
+           familyi={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \strng{fullhash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \strng{bibnamehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \strng{authorbibnamehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \strng{authornamehash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \strng{authorfullhash}{e0d1bfde0c2da91753f73c54bb4b74c5}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.3dgep.com/understanding-the-view-matrix}}
+      \field{note}{(Дата обращения: 12.10.2022)}
+      \field{title}{3D Game Engine Programming}
+      \field{year}{2011}
+    \endentry
+    \entry{Panov2017}{article}{}
+      \name{author}{1}{}{%
+        {{hash=a3364ac9233c7841be56b54da92e584f}{%
+           family={Панов},
+           familyi={П\bibinitperiod},
+           given={Тарас\bibnamedelima Евгеньевич},
+           giveni={Т\bibinitperiod\bibinitdelim Е\bibinitperiod}}}%
+      }
+      \strng{namehash}{a3364ac9233c7841be56b54da92e584f}
+      \strng{fullhash}{a3364ac9233c7841be56b54da92e584f}
+      \strng{bibnamehash}{a3364ac9233c7841be56b54da92e584f}
+      \strng{authorbibnamehash}{a3364ac9233c7841be56b54da92e584f}
+      \strng{authornamehash}{a3364ac9233c7841be56b54da92e584f}
+      \strng{authorfullhash}{a3364ac9233c7841be56b54da92e584f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Механико-математический факультет МГУ им. М. В. Ломоносова}
+      \field{title}{Геометрия}
+      \field{year}{2017}
+      \field{pages}{68}
+      \range{pages}{1}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
