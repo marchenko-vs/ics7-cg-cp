@@ -49,12 +49,12 @@ QT_MOC_LITERAL(299, 23), // "on_pushButton_8_clicked"
 QT_MOC_LITERAL(323, 24), // "on_pushButton_11_clicked"
 QT_MOC_LITERAL(348, 23), // "on_spinBox_valueChanged"
 QT_MOC_LITERAL(372, 4), // "arg1"
-QT_MOC_LITERAL(377, 25), // "on_spinBox_2_valueChanged"
-QT_MOC_LITERAL(403, 25), // "on_spinBox_3_valueChanged"
-QT_MOC_LITERAL(429, 25), // "on_spinBox_4_valueChanged"
-QT_MOC_LITERAL(455, 7), // "animate"
-QT_MOC_LITERAL(463, 6), // "render"
-QT_MOC_LITERAL(470, 12) // "generateRain"
+QT_MOC_LITERAL(377, 25), // "on_spinBox_4_valueChanged"
+QT_MOC_LITERAL(403, 7), // "animate"
+QT_MOC_LITERAL(411, 6), // "render"
+QT_MOC_LITERAL(418, 12), // "generateRain"
+QT_MOC_LITERAL(431, 25), // "on_spinBox_2_valueChanged"
+QT_MOC_LITERAL(457, 25) // "on_spinBox_3_valueChanged"
 
     },
     "MainWindow\0on_pushButton_2_clicked\0\0"
@@ -69,10 +69,9 @@ QT_MOC_LITERAL(470, 12) // "generateRain"
     "on_pushButton_8_clicked\0"
     "on_pushButton_11_clicked\0"
     "on_spinBox_valueChanged\0arg1\0"
-    "on_spinBox_2_valueChanged\0"
-    "on_spinBox_3_valueChanged\0"
     "on_spinBox_4_valueChanged\0animate\0"
-    "render\0generateRain"
+    "render\0generateRain\0on_spinBox_2_valueChanged\0"
+    "on_spinBox_3_valueChanged"
 };
 #undef QT_MOC_LITERAL
 
@@ -108,11 +107,11 @@ static const uint qt_meta_data_MainWindow[] = {
       17,    0,  167,    2, 0x08,   16 /* Private */,
       18,    1,  168,    2, 0x08,   17 /* Private */,
       20,    1,  171,    2, 0x08,   19 /* Private */,
-      21,    1,  174,    2, 0x08,   21 /* Private */,
-      22,    1,  177,    2, 0x08,   23 /* Private */,
-      23,    0,  180,    2, 0x08,   25 /* Private */,
-      24,    0,  181,    2, 0x08,   26 /* Private */,
-      25,    0,  182,    2, 0x08,   27 /* Private */,
+      21,    0,  174,    2, 0x08,   21 /* Private */,
+      22,    0,  175,    2, 0x08,   22 /* Private */,
+      23,    0,  176,    2, 0x08,   23 /* Private */,
+      24,    1,  177,    2, 0x08,   24 /* Private */,
+      25,    1,  180,    2, 0x08,   26 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -133,11 +132,11 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   19,
     QMetaType::Void, QMetaType::Int,   19,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   19,
     QMetaType::Void, QMetaType::Int,   19,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
 
        0        // eod
 };
@@ -165,12 +164,12 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 14: _t->on_pushButton_8_clicked(); break;
         case 15: _t->on_pushButton_11_clicked(); break;
         case 16: _t->on_spinBox_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 17: _t->on_spinBox_2_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 18: _t->on_spinBox_3_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 19: _t->on_spinBox_4_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 20: _t->animate(); break;
-        case 21: _t->render(); break;
-        case 22: _t->generateRain(); break;
+        case 17: _t->on_spinBox_4_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 18: _t->animate(); break;
+        case 19: _t->render(); break;
+        case 20: _t->generateRain(); break;
+        case 21: _t->on_spinBox_2_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 22: _t->on_spinBox_3_valueChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     }
@@ -184,7 +183,7 @@ const QMetaObject MainWindow::staticMetaObject = { {
     nullptr,
 qt_incomplete_metaTypeArray<qt_meta_stringdata_MainWindow_t
 , QtPrivate::TypeAndForceComplete<MainWindow, std::true_type>
-, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
+, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>
 
 
 >,

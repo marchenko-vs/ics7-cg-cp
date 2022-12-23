@@ -22,8 +22,6 @@
 #include "object.h"
 #include "matrix.h"
 
-#define rdtscll(val) __asm__ __volatile__("rdtsc" :"=A"(val))
-
 int *z_buffer;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -34,12 +32,14 @@ MainWindow::MainWindow(QWidget *parent)
     z_buffer = new int[WIDTH * HEIGHT];
     droplets = new RainDroplet *[NUM_OF_DROPLETS];
     rain_time = 100;
-    correction = 15;
+    previous_density = 0;
+    correction = 14;
     previous_time = 0;
     previous_size = 0;
     droplet_size_slider = 0;
     dy = -0.1;
     dx = dz = 0.0;
+    density = 0.2;
     previous_dx = previous_dz = 0;
     sum_dx_delta = 0.0, sum_dz_delta = 0.0;
     num_of_rows = cbrt(NUM_OF_DROPLETS);
@@ -55,13 +55,13 @@ MainWindow::MainWindow(QWidget *parent)
     QShortcut *press_s = new QShortcut(QKeySequence(Qt::Key_S),
                                        this, SLOT(rotate_down()));
     OriginalRainDroplet *main_droplet =
-            new OriginalRainDroplet("obj/double_cone.obj");
+            new OriginalRainDroplet("obj/droplet.obj");
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
         droplets[i] = new RainDroplet(main_droplet);
     ground = new Ground("obj/ground.obj");
     ground->scale(0.2, 0, 0.2);
     ground->translate(0, -.7, 0);
-    this->generateRain();
+    this->generateRain(density);
     this->render();
     animation_timer = new QTimer();
     connect(animation_timer, SIGNAL(timeout()), this, SLOT(animate()));
@@ -76,13 +76,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::generateRain()
+void MainWindow::generateRain(const double density)
 {
     const double left_x = -1.4;
     const double up_y = 1.1;
     bool even = 0;
     int cube = cbrt(NUM_OF_DROPLETS);
-    double density = 0.2;
     double init_dx = left_x, init_dy = up_y, init_dz = 1.6;
     double delta_x = density;
     double delta_y = density;
@@ -122,22 +121,18 @@ void MainWindow::generateRain()
 
 void MainWindow::animate()
 {
-    //std::size_t time_start = 0, time_end = 0;
-    //rdtscll(time_start);
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
     {
         if (droplets[i]->get_dy() < MIN_DROPLETS_Y)
         {
-            droplets[i]->set_dx(droplets[i]->get_dx() - sum_dx_delta * correction);
+            droplets[i]->set_dx(droplets[i]->get_dx() - this->sum_dx_delta * this->correction);
             droplets[i]->set_dy(1);
-            droplets[i]->set_dz(droplets[i]->get_dz() - sum_dz_delta * correction);
+            droplets[i]->set_dz(droplets[i]->get_dz() - this->sum_dz_delta * this->correction);
             continue;
         }
         droplets[i]->translate(dx, dy, dz);
     }
     this->render();
-    //rdtscll(time_end);
-    //qDebug() << time_end - time_start << "ticks";
 }
 
 void MainWindow::render()
@@ -219,6 +214,7 @@ void MainWindow::on_pushButton_12_clicked()
 {
     light_dir.set_x(DEFAULT_LIGHT_X);
     light_dir.set_y(DEFAULT_LIGHT_Y);
+    light_dir.set_z(DEFAULT_LIGHT_Z);
     this->render();
 }
 
@@ -252,15 +248,10 @@ void MainWindow::on_pushButton_11_clicked()
 
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
-    if (arg1 == 4)
-        correction = 5;
-    else if (arg1 == 5)
-        correction = 4;
     if (previous_time - arg1 < 0)
-        dy -= 0.005;
+        rain_time += 50;
     else if (previous_time - arg1 > 0)
-        dy += 0.005;
-
+        rain_time -= 50;
     previous_time = arg1;
 }
 
@@ -305,5 +296,17 @@ void MainWindow::on_spinBox_3_valueChanged(int arg1)
         sum_dz_delta -= 0.01;
     }
     previous_dz = arg1;
+}
+
+void MainWindow::on_spinBox_5_valueChanged(int arg1)
+{
+    this->animation_timer->stop();
+    if (this->previous_density - arg1 < 0)
+        this->density += 0.05;
+    else if (this->previous_density - arg1 > 0)
+        this->density -= 0.05;
+    this->previous_density = arg1;
+    this->generateRain(this->density);
+    this->animation_timer->start(this->rain_time);
 }
 
