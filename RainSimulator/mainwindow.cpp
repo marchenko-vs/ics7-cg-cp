@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     droplets = new RainDroplet *[NUM_OF_DROPLETS];
     rain_time = 100;
     previous_density = 0;
-    correction = 14;
+    correction = 15;
     previous_time = 0;
     previous_size = 0;
     droplet_size_slider = 0;
@@ -119,6 +119,16 @@ void MainWindow::generateRain(const double density)
     }
 }
 
+void MainWindow::set_default()
+{
+    for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
+    {
+        droplets[i]->set_dx(0.0);
+        droplets[i]->set_dy(0.0);
+        droplets[i]->set_dz(0.0);
+    }
+}
+
 void MainWindow::animate()
 {
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
@@ -126,7 +136,7 @@ void MainWindow::animate()
         if (droplets[i]->get_dy() < MIN_DROPLETS_Y)
         {
             droplets[i]->set_dx(droplets[i]->get_dx() - this->sum_dx_delta * this->correction);
-            droplets[i]->set_dy(1);
+            droplets[i]->set_dy(1.1);
             droplets[i]->set_dz(droplets[i]->get_dz() - this->sum_dz_delta * this->correction);
             continue;
         }
@@ -138,7 +148,7 @@ void MainWindow::animate()
 void MainWindow::render()
 {
     for (std::size_t i = 0; i < WIDTH * HEIGHT; i++)
-        z_buffer[i] = 0;
+        z_buffer[i] = -DEPTH;
     image->fill(mode.rgb());
     ground->draw(WIDTH, HEIGHT, 0, 154, 23, image);
     for (std::size_t i = 0; i < NUM_OF_DROPLETS; i++)
@@ -249,9 +259,21 @@ void MainWindow::on_pushButton_11_clicked()
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
     if (previous_time - arg1 < 0)
-        rain_time += 50;
+    {
+        if (arg1 == 5)
+            this->correction -= 4;
+        if (arg1 == 8)
+            this->correction -= 2;
+        this->dy -= 0.005;
+    }
     else if (previous_time - arg1 > 0)
-        rain_time -= 50;
+    {
+        if (arg1 == 4)
+            this->correction += 4;
+        if (arg1 == 7)
+            this->correction += 2;
+        this->dy += 0.005;
+    }
     previous_time = arg1;
 }
 
@@ -306,6 +328,7 @@ void MainWindow::on_spinBox_5_valueChanged(int arg1)
     else if (this->previous_density - arg1 > 0)
         this->density -= 0.05;
     this->previous_density = arg1;
+    this->set_default();
     this->generateRain(this->density);
     this->animation_timer->start(this->rain_time);
 }
